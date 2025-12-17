@@ -1,5 +1,5 @@
 from api import fetch_data
-import csv, datetime
+import csv, datetime,os
 
 def parse_data(data, line):
     segregated_data = []
@@ -19,3 +19,17 @@ def parse_data(data, line):
             data_to_write.append(entry_to_append)
 
     return data_to_write
+
+
+def append_to_file(data):
+    filename = 'output/output.csv'
+    fieldnames = data[0].keys()
+    file_exists = os.path.isfile(filename)
+
+    with open(filename, 'a', newline="", encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        if not file_exists or f.tell() == 0
+            writer.writeheader()
+
+        writer.writerows(data)
