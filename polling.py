@@ -2,11 +2,6 @@ import api, writer
 import datetime, time
 
 
-# fetch data
-# get all final stop numbers
-# write to the csv
-
-
 def parse_data(data, line):
     segregated_data = []
     for row in data:
@@ -147,17 +142,10 @@ def add_data_from_final_stops():
     keys = final_stops_1.keys()
 
     for i in keys:
-        out_1 = parse_data(api.fetch_data(final_stops_1[i]), i)
+        writer.append_to_file(parse_data(api.fetch_data(final_stops_1[i]), i))
         time.sleep(1)
-        out_2 = parse_data(api.fetch_data(final_stops_2[i]), i)
+        writer.append_to_file(parse_data(api.fetch_data(final_stops_2[i]), i))
         time.sleep(1)
-        writer.append_to_file(out_1 + out_2)
-        print(f"fetched line {i}")
-        print(out_1)
-        print(out_2)
-    
-
-    print("complete!")
 
 
 def main():
