@@ -1,4 +1,4 @@
-import datetime, requests, csv
+import requests, csv, time
 
 
 def fetch_data(stop_id):
@@ -19,8 +19,8 @@ def parse_data(data, line):
             calculated_delay = round((entry['estimatedDeparture'] - entry['scheduledDeparture']) / 60000)
             entry_to_append = {'line': entry['lineName'],
                             'calculated_delay': calculated_delay,
-                            'date': datetime.datetime.now().strftime("%Y-%m-%d"),
-                            'time': datetime.datetime.now().strftime("%H:%M"),
+                            'date': time.strftime("%Y-%m-%d", time.localtime()),
+                            'time': time.strftime("%H:%M", time.localtime()),
                             'vechicle_number': entry['vehicleNumber']}
             data_to_write.append(entry_to_append)
 
@@ -170,8 +170,10 @@ def main():
         write_to_file(out_1+out_2)
 
     print("complete!")
-    print()
 
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    end = time.time()
+    print(f"{round(end - start, 3)}s")
