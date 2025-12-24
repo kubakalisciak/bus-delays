@@ -1,17 +1,22 @@
-import api, writer
-import datetime, time
+import datetime, requests, csv
+
+
+def fetch_data(stop_id):
+    endpoint = f"https://przystanki.bialystok.pl/csip/vm_channel/departures.json?symbol={stop_id}"
+    response = requests.get(endpoint).json()['departures']
+    return response
 
 
 def parse_data(data, line):
     segregated_data = []
     for row in data:
-        if row['lineName'] is line:
+        if row['lineName'] == line:
             segregated_data.append(row)
 
     data_to_write = []
     for entry in segregated_data:
         if entry['online']:
-            calculated_delay = round((entry['scheduledDeparture'] - entry['estimatedDeparture']) / 60000)
+            calculated_delay = round((entry['estimatedDeparture'] - entry['scheduledDeparture']) / 60000)
             entry_to_append = {'line': entry['lineName'],
                             'calculated_delay': calculated_delay,
                             'date': datetime.datetime.now().strftime("%Y-%m-%d"),
@@ -22,8 +27,25 @@ def parse_data(data, line):
     return data_to_write
 
 
-def add_data_from_final_stops():
-    final_stops_1 = {'1': '188',
+def write_to_file(data):
+    filename = 'output.csv'
+    fieldnames = ['line', 'calculated_delay', 'date', 'time', 'vechicle_number']
+
+    try:
+        with open(filename, 'a', newline="", encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            for row in data:
+                writer.writerow(row)
+    except FileNotFoundError:
+        with open(filename, 'w', newline="", encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+
+        writer.writerows(data)
+
+
+def main():
+    final_stops_1 = {'1': '799',
                      '2': '635',
                      '3': '261',
                      '4': '274',
@@ -80,11 +102,10 @@ def add_data_from_final_stops():
                      'N5': '990',
                      'N6': '990'
                      }
-    
     final_stops_2 = {'1': '551',
                      '2': '296',
                      '3': '741',
-                     '4': '692',
+                     '4': '560',
                      '5': '043',
                      '6': '277',
                      '7': '270',
@@ -138,18 +159,18 @@ def add_data_from_final_stops():
                      'N5': '400',
                      'N6': '578'
                      }
-    
-    keys = final_stops_1.keys()
-
+    keys = list(final_stops_1.keys())
     for i in keys:
-        writer.append_to_file(parse_data(api.fetch_data(final_stops_1[i]), i))
-        time.sleep(1)
-        writer.append_to_file(parse_data(api.fetch_data(final_stops_2[i]), i))
-        time.sleep(1)
+        print(f"fetching line {i}...")
+        out_1 = parse_data(fetch_data(final_stops_1[i]), i)
+        print(out_1)
+        out_2 = parse_data(fetch_data(final_stops_2[i]), i)
+        print(out_2)
+        print(f"fetched line {i}")
+        write_to_file(out_1+out_2)
 
-
-def main():
-    add_data_from_final_stops()
+    print("complete!")
+    print()
 
 
 if __name__ == "__main__":
