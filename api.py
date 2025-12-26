@@ -1,4 +1,4 @@
-import requests, csv, time
+import requests, csv, time, os
 
 
 def fetch_data(stop_id):
@@ -28,7 +28,7 @@ def parse_data(data, line):
 
 
 def write_to_file(data):
-    filename = 'output.csv'
+    filename = os.path.join('output', 'output.csv')
     fieldnames = ['line', 'calculated_delay', 'date', 'time', 'vechicle_number']
 
     try:
@@ -161,11 +161,8 @@ def main():
                      }
     keys = list(final_stops_1.keys())
     for i in keys:
-        print(f"fetching line {i}...")
         out_1 = parse_data(fetch_data(final_stops_1[i]), i)
-        print(out_1)
         out_2 = parse_data(fetch_data(final_stops_2[i]), i)
-        print(out_2)
         print(f"fetched line {i}")
         write_to_file(out_1+out_2)
 
