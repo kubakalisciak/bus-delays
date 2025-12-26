@@ -21,27 +21,26 @@ def parse_data(data, line):
                             'calculated_delay': calculated_delay,
                             'date': time.strftime("%Y-%m-%d", time.localtime()),
                             'time': time.strftime("%H:%M", time.localtime()),
-                            'vechicle_number': entry['vehicleNumber']}
+                            'vehicle_number': entry['vehicleNumber']}
             data_to_write.append(entry_to_append)
 
     return data_to_write
 
 
 def write_to_file(data):
-    filename = os.path.join('output', 'output.csv')
-    fieldnames = ['line', 'calculated_delay', 'date', 'time', 'vechicle_number']
-
-    try:
-        with open(filename, 'a', newline="", encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            for row in data:
-                writer.writerow(row)
-    except FileNotFoundError:
-        with open(filename, 'w', newline="", encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
+    dir_name = 'output'
+    filename = os.path.join(dir_name, 'output.csv')
+    fieldnames = ['line', 'calculated_delay', 'date', 'time', 'vehicle_number']
+    file_exists = os.path.isfile(filename)
+    os.makedirs(dir_name, exist_ok=True)
+    
+    with open(filename, 'a', newline="", encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        if not file_exists:
             writer.writeheader()
+        for row in data:
+            writer.writerow(row)
 
-        writer.writerows(data)
 
 
 def main():
@@ -95,12 +94,6 @@ def main():
                      '200': '1210',
                      '201': '1949',
                      '202': '1209',
-                     'N1': '308',
-                     'N2': '308',
-                     'N3': '416',
-                     'N4': '990',
-                     'N5': '990',
-                     'N6': '990'
                      }
     final_stops_2 = {'1': '551',
                      '2': '296',
@@ -152,14 +145,9 @@ def main():
                      '200': '830',
                      '201': '1979',
                      '202': '1839',
-                     'N1': '337',
-                     'N2': '052',
-                     'N3': '296',
-                     'N4': '703',
-                     'N5': '400',
-                     'N6': '578'
                      }
     keys = list(final_stops_1.keys())
+
     for i in keys:
         out_1 = parse_data(fetch_data(final_stops_1[i]), i)
         out_2 = parse_data(fetch_data(final_stops_2[i]), i)
