@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import os, csv
 
-dir_name = 'output'
 
 def read_data_from_file():
+    dir_name = 'output'
     filename = os.path.join(dir_name, 'output.csv')
     output = []
     with open(filename, 'r') as file:
@@ -13,81 +13,95 @@ def read_data_from_file():
 
     return output
 
+
+def draw_graph(labels, values, xlabel, ylabel, title, filename):
+    dir_name = 'output'
+    os.makedirs(dir_name, exist_ok=True)
+
+    fig, axis = plt.subplots()
+        
+    axis.bar(labels, values)
+    axis.set_xlabel(xlabel)
+    axis.set_ylabel(ylabel)
+
+    if min(values) > 0:
+        axis.set_ylim(bottom=0)
+
+    axis.set_title(title)
+    axis.tick_params(axis='x', rotation=90)
+    axis.grid(axis='x', linestyle='-', alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(dir_name, filename))
+    plt.close()
+
+
+
+def sort_graph_items(data, value_as_num=False, key_as_num=False):
+    if key_as_num:
+        dict_keys = data.keys()
+        int_keys_data = {}
+        for key in dict_keys:
+            int_keys_data[int(key)] = data[key]
+        sorted_data = sorted(int_keys_data.items())
+    else:
+        sorted_data = sorted(data.items())
+    labels = []
+    values = []
+    for row in sorted_data:
+        labels.append(str(row[0]))
+        values.append(str(row[1]))
+    if value_as_num:
+        values = list(map(float, values))
+
+    return labels, values
+
+
+def calculate_average_delays(count, summed_delays):
+    avg_delays = {}
+    for i in count.keys():
+        avg_delays[i] = summed_delays[i] / count[i]
+
+    return avg_delays
+
+
 def graph_average_delays_by_line():
-    count, total_delay = {}, {}
+    count, summed_delays = {}, {}
     data = read_data_from_file()
     for row in data:
         line = row['line']
         try:
             count[line] += 1
-            total_delay[line] += int(row['calculated_delay'])
+            summed_delays[line] += int(row['calculated_delay'])
         except KeyError:
             count[line] = 1
-            total_delay[line] = int(row['calculated_delay'])
+            summed_delays[line] = int(row['calculated_delay'])
 
-    # compute average delays
-    avg_delays = {}
-    for i in count.keys():
-        avg_delays[i] = total_delay[i] / count[i]
-    avg_delays = dict(sorted(avg_delays.items()))
+    avg_delays = calculate_average_delays(count, summed_delays)
 
-    # plot the graph
-    sorted_items = sorted(avg_delays.items(), key=lambda x: int(x[0]))
-    labels = [str(k) for k, v in sorted_items]
-    values = [v for k, v in sorted_items]
+    labels, values = sort_graph_items(avg_delays, value_as_num=True, key_as_num=True)
 
-    fig = plt.figure()
-    axis = fig.add_subplot(111)
-
-    axis.bar(labels, values)
-    axis.set_xlabel('Line')
-    axis.set_ylabel('Average Delay')
-    axis.set_title('Average Delay by Line')
-    plt.xticks(rotation=90)
-    plt.tight_layout()
-    axis.grid(axis='x', linestyle='-', alpha=0.3)
-
-    plt.savefig(os.path.join(dir_name, 'avg_delay__line.png'))
-    plt.close()
+    draw_graph(labels, values, 'linia', 'średnie opóźnienie', 'wykres1', 'avg_delay__line.png')
 
 
 def graph_average_delays_by_day():
+    count, summed_delays = {}, {}
     data = read_data_from_file()
-    count, total_delay = {}, {}
     for row in data:
         date = row['date']
         try:
             count[date] += 1
-            total_delay[date] += int(row['calculated_delay'])
+            summed_delays[date] += int(row['calculated_delay'])
         except KeyError:
             count[date] = 1
-            total_delay[date] = int(row['calculated_delay'])
+            summed_delays[date] = int(row['calculated_delay'])
 
-    # compute average delays
-    avg_delays = {}
-    for i in count.keys():
-        avg_delays[i] = total_delay[i] / count[i]
-    avg_delays = dict(sorted(avg_delays.items()))
+    avg_delays = calculate_average_delays(count, summed_delays)
 
-    # plot the graph
-    sorted_items = sorted(avg_delays.items())
-    labels = [str(k) for k, v in sorted_items]
-    values = [v for k, v in sorted_items]
+    labels, values = sort_graph_items(avg_delays, value_as_num=True)
+    values = [round(x, 2) for x in values]
 
-    fig = plt.figure()
-    axis = fig.add_subplot(111)
-
-    axis.bar(labels, values)
-    axis.set_xlabel('Line')
-    axis.set_ylabel('Average Delay')
-    axis.set_title('Average Delay by Day')
-    plt.xticks(rotation=90)
-    plt.tight_layout()
-    axis.grid(axis='x', linestyle='-', alpha=0.3)
-
-    plt.savefig(os.path.join(dir_name, 'avg_delay__day.png'))
-    plt.close()
-
+    draw_graph(labels, values, 'dzień', 'średnie opóźnienie', 'wykres2', 'avg_delay__day.png')
 
 
 def main():
