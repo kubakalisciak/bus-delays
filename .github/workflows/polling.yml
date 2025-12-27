@@ -22,24 +22,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests matplotlib pandas
 
-      - name: Create output folder
+      - name: create output folder
         run: mkdir -p output
 
-      - name: Backup old CSV if exists
+      - name: backup old CSV if exists
         run: |
           if [ -f output/output.csv ]; then
             cp output/output.csv output/old.csv
           fi
 
-      - name: Run polling script
+      - name: run polling script
         run: python api.py
 
-      - name: Append new data to old CSV
+      - name: append new data to old CSV
         run: |
           python - <<EOF
           import pandas as pd
@@ -55,10 +55,10 @@ jobs:
               df_combined.to_csv(new_file, index=False)
           EOF
 
-      - name: Commit and push CSV
+      - name: commit and push CSV
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output/output.csv
-          git commit -m "Update output.csv [ci skip]" || echo "No changes to commit"
+          git commit -m "ACTIONS: Add new data [ci skip]" || echo "No changes to commit"
           git push
