@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import os, csv
+import os, csv, sys
 
 
 def read_data_from_file():
@@ -104,8 +104,14 @@ def graph_average_delays_by_day():
 
 
 def main():
-    graph_average_delays_by_line()
-    graph_average_delays_by_day()
+    match sys.argv[1]:
+        case '--avg-delay-line':
+            graph_average_delays_by_line()
+        case '--avg-delay-day':
+            graph_average_delays_by_day()
+        case _:
+            print("Invalid command. Try again.")
+            print("Refer to README.md for possible options.")
 
 
 if __name__ == "__main__":
