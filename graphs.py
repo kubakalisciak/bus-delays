@@ -15,7 +15,7 @@ def read_data_from_file():
 
 
 def draw_graph(labels, values, xlabel, ylabel, title, filename):
-    dir_name = 'output'
+    dir_name = 'graphs'
     os.makedirs(dir_name, exist_ok=True)
 
     fig, axis = plt.subplots()
@@ -36,8 +36,7 @@ def draw_graph(labels, values, xlabel, ylabel, title, filename):
     plt.close()
 
 
-
-def sort_graph_items(data, value_as_num=False, key_as_num=False):
+def prepare_graph_items(data, value_as_num=False, key_as_num=False):
     if key_as_num:
         dict_keys = data.keys()
         int_keys_data = {}
@@ -79,7 +78,7 @@ def graph_average_delays_by_line():
 
     avg_delays = calculate_average_delays(count, summed_delays)
 
-    labels, values = sort_graph_items(avg_delays, value_as_num=True, key_as_num=True)
+    labels, values = prepare_graph_items(avg_delays, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values, 'linia', 'średnie opóźnienie', 'wykres1', 'avg_delay__line.png')
 
@@ -98,13 +97,14 @@ def graph_average_delays_by_day():
 
     avg_delays = calculate_average_delays(count, summed_delays)
 
-    labels, values = sort_graph_items(avg_delays, value_as_num=True)
+    labels, values = prepare_graph_items(avg_delays, value_as_num=True)
     values = [round(x, 2) for x in values]
 
     draw_graph(labels, values, 'dzień', 'średnie opóźnienie', 'wykres2', 'avg_delay__day.png')
 
 
 def main():
+    graph_average_delays_by_line()
     graph_average_delays_by_day()
 
 
