@@ -41,25 +41,26 @@ pip install -r requirements.txt
 
      - Notes: the workflow commits and pushes to the `data` branch (it may force-push). Pulling the single CSV file is safer than merging the entire branch if you only want the artifact.
 
-2. Generate the graphs
+2. Generate graphs
 
-         - Generate graphs from the CSV using `graphs.py`. The script reads `output/output.csv` and writes PNGs to the `graphs/` directory.
-         - Supported flags:
+   - Run graphs.py to generate graphs from the CSV. The images are saved in the graphs/ directory.
 
-             |Flag|Graph|Filename|
-             |----|----|----|
-             |`--avg-delay-line`|Average delay over the whole dataset on every line.|`avg_delay__line.png`|
-             |`--avg-delay-day`|Average delay over the whole dataset on every day|`avg_delay__day.png`|
+   - Supported flags:
 
-         - Example
-         ```bash
-         # average delay per line
-         python graphs.py --avg-delay-line
+|Flag|Graph Description|Filename|
+|---|---|---|
+|`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`
+`--avg-delay-day`|Average delay over the dataset by day|`avg_delay__day.png`
 
-         # average delay per day
-         python graphs.py --avg-delay-day
-         ```
+Examples:
 
+```bash
+# Average delay per line
+python graphs.py --avg-delay-line
+
+# Average delay per day
+python graphs.py --avg-delay-day
+```
 3. Access the graphs
 
      - The generated images are saved in `graphs/`. List or open them with your OS image viewer:
