@@ -38,5 +38,5 @@ jobs:
       - name: Upload CSV as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: data.csv
+          name: bus-delay-csv-${{ github.run_id }}
           path: output/output.csv
