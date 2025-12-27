@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  fetch-and-clean:
+  add-data:
     runs-on: ubuntu-latest
 
     steps:
@@ -67,11 +67,19 @@ jobs:
           df.to_csv(file, index=False)
           EOF
 
-      - name: commit and push
+      - name: create/update branch and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          BRANCH="data"
+          
+          if git show-ref --verify --quiet refs/heads/$BRANCH; then
+            git checkout $BRANCH
+          else
+            git checkout -b $BRANCH
+          fi
+
           git add output/output.csv
           git commit -m "ACTIONS: update data [ci skip]" || echo "No changes"
-          git push origin main
-
+          git push origin $BRANCH --force
