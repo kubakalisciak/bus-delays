@@ -2,33 +2,41 @@ name: polling
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+    - cron: '*/15 * * * *'   # co 15 minut UTC
+  workflow_dispatch:         # pozwala też ręczne uruchomienie
 
 jobs:
   fetch-data:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib requests
+          pip install -r requirements.txt
+          
+      - name: Create output folder
+        run: mkdir -p output
 
-      - name: run script
+      # 5️⃣ Uruchomienie skryptu
+      - name: Run polling script
         run: python api.py
-
-      - name: commit CSV to data branch
+        
+      - name: Commit CSV to data branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
+          git fetch origin
           git checkout data || git checkout -b data
           git add output/output.csv
           git commit -m "Update output.csv" || echo "No changes to commit"
-          git push origin data
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} data
