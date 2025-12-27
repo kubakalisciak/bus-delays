@@ -1,32 +1,23 @@
-
 # bus-delay-inator
-
-A quirky project gathering data on delays of buss in my hometown (Białystok) and working with those data. Also a kind of exercies in matplotlib and Github Actions.
-
+A quirky project gathering data on delays of buss in my hometown (Białystok) and working with those data. Also a kind of exercise in matplotlib and Github Actions.
 
 ## Features
-
 - Polling data
 - Automatic polling every X minutes via Github Actions
 - Making graphs
 - And many more to come…
 
-
 ## Installation
-
-Create and activate a virtual environment:
+Clone the repository and install dependencies (example uses pip and a virtualenv):
 ```bash
-python -m venv venv
-source venv/bin/activate
+git clone https://github.com/kubakalisciak/bus-delays.git
+cd bus-delays
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
-Then, install the dependencies:
-```bash
-pip install matplotlib requests
-```
-
 
 ## To-Do's
-
 - [ ] Gather the artifacts from Github Actions
 - [ ] Add more graphs
     - Average delays by tme of day
@@ -34,6 +25,7 @@ pip install matplotlib requests
     - Trends over days, weeks etc.
     - How much on time, delayed, early etc.
 - [ ] Add some ML capabilities
-## License
+- [ ] Add a 'Usage' section to the README
 
-This project is licensed under the[GPL v3.0 License](LICENSE)
+## License
+This project is licensed under the [GPL v3.0 License](LICENSE)
