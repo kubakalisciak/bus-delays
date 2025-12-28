@@ -6,40 +6,67 @@ on:
   workflow_dispatch:  # allows manual trigger
 
 concurrency:
-  group: bus-delays-data
-  cancel-in-progress: false
+  group: fetch-data
+  cancel-in-progress: true  # prevents overlapping runs
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # needed for force push
 
-      - name: Set up Python
+      - name: set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # specify your desired Python version
+          python-version: '3.11'
 
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: Generate CSV
+      - name: generate or append CSV
+        id: generate_csv
         run: |
+          # Dynamic filename based on current month
+          CSV_FILE=$(python -c "from datetime import datetime; print('output/' + datetime.now().strftime('%Y-%m') + '.csv')")
+          echo "CSV_FILE=$CSV_FILE" >> $GITHUB_ENV
+
+          # Ensure output directory exists
+          mkdir -p output
+
+          # Run Python script — it handles appending internally
           python api.py
 
-      - name: Commit and force push to data branch
+      - name: commit and push to "data" branch
         run: |
+          set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git checkout data || git checkout -b data
-          git add output/2025-12.csv
-          git commit -m "ACTIONS: append data" || echo "Nothing to commit"
+          # Fetch the data branch if it exists
+          git fetch origin data || true
 
-          # Force push to overwrite data branch safely
-          git push --force-with-lease origin data
+          # Switch to data branch or create it
+          git switch data || git switch -c data
+
+          # Recompute CSV_FILE if not set
+          CSV_FILE="${CSV_FILE:-$(python -c "from datetime import datetime; print(\"output/\" + datetime.now().strftime('%Y-%m') + \".csv\")")}"
+
+          # Ensure output directory exists
+          mkdir -p output
+
+          # Add CSV file
+          git add "$CSV_FILE" || true
+
+          # Commit only if changes exist
+          if git diff --cached --quiet; then
+            echo "No new data to commit"
+          else
+            git commit -m "ACTIONS: append new data"
+            git push --force-with-lease origin data
+          fi
