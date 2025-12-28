@@ -6,13 +6,8 @@ on:
   workflow_dispatch:  # allows manual trigger
 
 concurrency:
-  group: bus-delays-data
-  cancel-in-progress: false
-
-# Prevent overlapping cron runs
-concurrency:
   group: fetch-data
-  cancel-in-progress: true
+  cancel-in-progress: true  # prevents overlapping runs
 
 jobs:
   fetch:
@@ -27,24 +22,39 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # specify your desired Python version
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: Generate CSV
+      - name: Generate or append CSV
+        id: generate_csv
         run: |
+          # Dynamic filename based on current month
+          CSV_FILE=$(python -c "from datetime import datetime; print('output/' + datetime.now().strftime('%Y-%m') + '.csv')")
+          echo "CSV_FILE=$CSV_FILE" >> $GITHUB_ENV
+
+          # Ensure output directory exists
+          mkdir -p output
+
+          # Run Python script — it handles appending internally
           python api.py
 
-      - name: Commit and force push to data branch
+      - name: Commit and push to data branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git checkout data || git checkout -b data
-          git add output/2025-12.csv
-          git commit -m "ACTIONS: append data" || echo "Nothing to commit"
+          # Switch to data branch or create it
+          git switch data || git switch -c data
 
-          # Force push to overwrite data branch safely
-          git push --force-with-lease origin data
+          # Add the CSV file
+          git add $CSV_FILE
+
+          # Commit only if there are changes
+          if git diff --cached --quiet; then
+            echo "No new data to commit"
+          else
+            git commit -m "ACTIONS: append new bus delay data"
+            git push --force-with-lease origin data
