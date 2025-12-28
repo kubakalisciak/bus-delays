@@ -4,7 +4,7 @@ import os, csv, sys
 
 def read_dataset(filename):
     dir_name = 'output'
-    filepath = os.path.join(dir_name, filename)
+    filepath = os.path.join(dir_name, filename[2:])
     output = []
     try:
         with open(filepath, 'r') as file:
@@ -26,7 +26,7 @@ def draw_graph(labels, values, xlabel, ylabel, title, filename):
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
 
-    if min(values) > 0:
+    if min(values, default=0) > 0:
         axis.set_ylim(bottom=0)
 
     axis.set_title(title)
