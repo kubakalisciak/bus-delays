@@ -55,7 +55,11 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No new data to commit"
-          else
-            git commit -m "ACTIONS: append transport data"
-            git push origin data
+            exit 0
           fi
+
+          git commit -m "ACTIONS: append transport data"
+
+          # 🔑 THIS IS THE IMPORTANT FIX
+          git pull --rebase origin data
+          git push origin data
