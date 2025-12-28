@@ -2,15 +2,17 @@ import matplotlib.pyplot as plt
 import os, csv, sys
 
 
-def read_data_from_file():
+def read_dataset(filename):
     dir_name = 'output'
-    filename = os.path.join(dir_name, 'output.csv')
+    filepath = os.path.join(dir_name, filename)
     output = []
-    with open(filename, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            output.append(row)
-
+    try:
+        with open(filepath, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                output.append(row)
+    except FileNotFoundError:
+        print("This dataset does not exist.")
     return output
 
 
@@ -64,9 +66,9 @@ def calculate_average_delays(count, summed_delays):
     return avg_delays
 
 
-def graph_average_delays_by_line():
+def graph_average_delays_by_line(dataset):
     count, summed_delays = {}, {}
-    data = read_data_from_file()
+    data = read_dataset(f"{dataset}.csv")
     for row in data:
         line = row['line']
         try:
@@ -83,9 +85,9 @@ def graph_average_delays_by_line():
     draw_graph(labels, values, 'linia', 'średnie opóźnienie', 'wykres1', 'avg_delay__line.png')
 
 
-def graph_average_delays_by_day():
+def graph_average_delays_by_day(dataset):
     count, summed_delays = {}, {}
-    data = read_data_from_file()
+    data = read_dataset(f"{dataset}.csv")
     for row in data:
         date = row['date']
         try:
@@ -106,9 +108,9 @@ def graph_average_delays_by_day():
 def main():
     match sys.argv[1]:
         case '--avg-delay-line':
-            graph_average_delays_by_line()
+            graph_average_delays_by_line(sys.argv[2])
         case '--avg-delay-day':
-            graph_average_delays_by_day()
+            graph_average_delays_by_day(sys.argv[2])
         case _:
             print("Invalid command. Try again.")
             print("Refer to README.md for possible options.")

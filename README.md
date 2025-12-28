@@ -45,21 +45,22 @@ pip install -r requirements.txt
 
    - Run graphs.py to generate graphs from the CSV. The images are saved in the graphs/ directory.
 
-   - Supported flags:
+   - Choose the the graph type (the 1st flag):
 
 |Flag|Graph Description|Filename|
 |---|---|---|
 |`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`
 `--avg-delay-day`|Average delay over the dataset by day|`avg_delay__day.png`
 
+  - Pick the dataset (*monthly*) (the 2nd flag)
+    - Format: `--YYYY-MM`, where `YYYY` is the full year number and `MM` the zero-padded month number
+
 Examples:
 
 ```bash
-# Average delay per line
-python graphs.py --avg-delay-line
+python graphs.py --avg-delay-line --2025-12
 
-# Average delay per day
-python graphs.py --avg-delay-day
+python graphs.py --avg-delay-day --2026-02
 ```
 3. Access the graphs
 
