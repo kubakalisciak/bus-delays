@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+from draw import draw_graph
 import os, csv, sys, statistics
 
 
@@ -15,50 +15,6 @@ def read_dataset(set_name):
         print("This dataset does not exist.")
     return output
 
-
-def draw_graph(labels, values, xlabel, ylabel, title, filename, color_mapping=None, rotation=True):
-    """
-    Draw a bar graph with the given labels and values.
-
-    Parameters:
-    labels (list[str]): The labels for the bars in the graph.
-    values (list[int]): The values for the bars in the graph.
-    xlabel (str): The label for the x-axis.
-    ylabel (str): The label for the y-axis.
-    title (str): The title for the graph.
-    filename (str): The filename for the graph.
-    color_mapping (dict[str, str], optional): A dictionary mapping labels to colors. Defaults to None.
-    rotation (bool, optional): Whether to rotate the x-axis labels by 90 degrees. Defaults to True.
-
-    Returns:
-    None
-    """
-    dir_name = 'graphs'
-    os.makedirs(dir_name, exist_ok=True)
-
-    fig, axis = plt.subplots()
-
-    if color_mapping:
-        colors = [color_mapping.get(label, 'gray') for label in labels]
-        axis.bar(labels, values, color=colors)
-        axis.set_xlabel(xlabel)
-        axis.set_ylabel(ylabel)
-    else:
-        axis.bar(labels, values)
-        axis.set_xlabel(xlabel)
-        axis.set_ylabel(ylabel)
-
-    if min(map(int, values)) > 0:
-        axis.set_ylim(bottom=0)
-
-    axis.set_title(title)
-    if rotation:
-        axis.tick_params(axis='x', rotation=90)
-    axis.grid(axis='x', linestyle='-', alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(dir_name, filename))
-    plt.close()
 
 def sort_by_labels(data, value_as_num=False, key_as_num=False):
     if key_as_num:
