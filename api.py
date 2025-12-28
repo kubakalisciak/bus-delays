@@ -8,42 +8,53 @@ def fetch_data(stop_id):
 
 
 def parse_data(data, line):
-    segregated_data = []
-    for row in data:
-        if row['lineName'] == line:
-            segregated_data.append(row)
-
     data_to_write = []
-    for entry in segregated_data:
-        if entry['online']:
-            calculated_delay = round((entry['estimatedDeparture'] - entry['scheduledDeparture']) / 60000)
-            entry_to_append = {'line': entry['lineName'],
-                            'calculated_delay': calculated_delay,
-                            'date': time.strftime("%Y-%m-%d", time.localtime()),
-                            'time': time.strftime("%H:%M", time.localtime()),
-                            'vehicle_number': entry['vehicleNumber']}
+    for entry in data:
+        if entry['lineName'] == line and entry['online']:
+            calculated_delay = round(
+                (entry['estimatedDeparture'] - entry['scheduledDeparture']) / 60000
+            )
+
+            entry_to_append = {
+                'line': entry['lineName'],
+                'calculated_delay': calculated_delay,
+                'date': time.strftime("%Y-%m-%d", time.localtime()),
+                'time': time.strftime("%H:%M", time.localtime()),
+                'vehicle_number': entry['vehicleNumber']
+            }
+
             data_to_write.append(entry_to_append)
 
     return data_to_write
 
 
 def write_to_file(data):
+    if not data:
+        return 0
+
     dir_name = 'output'
-    filename = os.path.join(dir_name, 'output.csv')
+    os.makedirs(dir_name, exist_ok=True)
+
+    filename = os.path.join(dir_name, f"{time.strftime('%Y-%m')}.csv")
+
     fieldnames = ['line', 'calculated_delay', 'date', 'time', 'vehicle_number']
     file_exists = os.path.isfile(filename)
-    os.makedirs(dir_name, exist_ok=True)
-    
+
     with open(filename, 'a', newline="", encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
+
         if not file_exists:
             writer.writeheader()
+
         for row in data:
             writer.writerow(row)
+
+    return len(data)
 
 
 
 def main():
+    start_time = time.tine()
     final_stops_1 = {'1': '799',
                      '2': '635',
                      '3': '261',
@@ -146,19 +157,25 @@ def main():
                      '201': '1979',
                      '202': '1839',
                      }
-    keys = list(final_stops_1.keys())
 
-    for i in keys:
-        out_1 = parse_data(fetch_data(final_stops_1[i]), i)
-        out_2 = parse_data(fetch_data(final_stops_2[i]), i)
-        print(f"fetched line {i}")
-        write_to_file(out_1+out_2)
+    for line in final_stops_1.keys():
+        out_1 = parse_data(fetch_data(final_stops_1[line]), line)
+        out_2 = parse_data(fetch_data(final_stops_2[line]), line)
 
-    print("complete!")
+        rows_written = write_to_file(out_1 + out_2)
+        total_rows += rows_written
+
+        print(f"Line {line}: appended {rows_written} rows")
+
+    elapsed = round(time.time() - start_time, 2)
+
+    print("===================================")
+    print(f"Run complete")
+    print(f"Rows appended: {total_rows}")
+    print(f"Target file: output/{time.strftime('%Y-%m')}.csv")
+    print(f"Runtime: {elapsed}s")
+    print("===================================")
 
 
 if __name__ == "__main__":
-    start = time.time()
     main()
-    end = time.time()
-    print(f"{round(end - start, 3)}s")
