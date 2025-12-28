@@ -2,11 +2,12 @@ name: fetch
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
-  workflow_dispatch:
+    - cron: '*/10 * * * *'  # runs every 10 minutes
+  workflow_dispatch:  # allows manual trigger
 
-permissions:
-  contents: write
+concurrency:
+  group: bus-delays-data
+  cancel-in-progress: false
 
 # Prevent overlapping cron runs
 concurrency:
@@ -18,48 +19,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          persist-credentials: true
+          fetch-depth: 0  # needed for force push
 
-      - name: checkout or create data branch
-        run: |
-          BRANCH="data"
-          if git show-ref --verify --quiet refs/heads/$BRANCH; then
-            git checkout $BRANCH
-          else
-            git checkout -b $BRANCH
-          fi
-
-      - name: set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.11'  # specify your desired Python version
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests
+          pip install -r requirements.txt
 
-      - name: run polling script (append-only, monthly CSV)
-        run: python api.py
+      - name: Generate CSV
+        run: |
+          python api.py
 
-      - name: commit and push if data changed
+      - name: Commit and force push to data branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add output/*.csv
+          git checkout data || git checkout -b data
+          git add output/2025-12.csv
+          git commit -m "ACTIONS: append data" || echo "Nothing to commit"
 
-          if git diff --cached --quiet; then
-            echo "No new data to commit"
-            exit 0
-          fi
-
-          git commit -m "ACTIONS: append transport data"
-
-          # 🔑 THIS IS THE IMPORTANT FIX
-          git pull --rebase origin data
-          git push origin data
+          # Force push to overwrite data branch safely
+          git push --force-with-lease origin data
