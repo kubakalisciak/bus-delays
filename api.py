@@ -54,7 +54,7 @@ def write_to_file(data):
 
 
 def main():
-    start_time = time.tine()
+    start_time = time.time()
     final_stops_1 = {'1': '799',
                      '2': '635',
                      '3': '261',
