@@ -31,15 +31,17 @@ jobs:
       - name: generate or append CSV
         id: generate_csv
         run: |
-          # Dynamic filename based on current month
-          CSV_FILE=$(python -c "from datetime import datetime; print('output/' + datetime.now().strftime('%Y-%m') + '.csv')")
-          echo "CSV_FILE=$CSV_FILE" >> $GITHUB_ENV
-
           # Ensure output directory exists
           mkdir -p output
 
+          # Switch to the "data" branch
+          git switch data || git switch -c data
+
           # Run Python script — it handles appending internally
           python api.py
+
+          # Switch back to the main branch
+          git switch main
 
       - name: commit and push to "data" branch
         run: |
