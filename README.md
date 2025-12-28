@@ -56,9 +56,12 @@ pip install -r requirements.txt
 |Flag|Graph Description|Filename|
 |---|---|---|
 |`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`|
-|`--avg-delay-date`|Average delay over the dataset by day|`avg_delay__date.png`|
+|`--avg-delay-date`|Average delay over the dataset by date|`avg_delay__date.png`|
 |`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
 |`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
+|`--median-delay-line`|Median delay over the dataset by line|`median_delay__line.png`|
+|`--median-delay-date`|Median delay over the dataset by date|`median_delay__date.png`|
+
 
     - Pick the dataset (*monthly*) (the 2nd flag)
 
@@ -88,6 +91,7 @@ python graphs.py --avg-delay-day --2026-02
     - Most delayed lines/vehicles
     - Trends over days, weeks etc.
     - ~~How much on time, delayed, early etc.~~
+    - Median delays
 - [ ] Add some ML capabilities
 - [ ] Add a flag to use all datasets
 - [x] Add a 'Usage' section to the README

@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import os, csv, sys
+import os, csv, sys, statistics
 
 
 def read_dataset(set_name):
@@ -59,7 +59,6 @@ def draw_graph(labels, values, xlabel, ylabel, title, filename, color_mapping=No
     plt.tight_layout()
     plt.savefig(os.path.join(dir_name, filename))
     plt.close()
-
 
 def sort_by_labels(data, value_as_num=False, key_as_num=False):
     if key_as_num:
@@ -159,7 +158,7 @@ def graph_average_delays_by_day(dataset):
                'average delay',
                'Average delay by date',
                'avg_delay__date.png')
-
+    
 
 def graph_punctuality(dataset):
     collected_data = calculate_punctuality_status(dataset)
@@ -210,6 +209,51 @@ def graph_punctuality_percentage(dataset):
                'punctuality_percent.png', 
                color_mapping=mapping, 
                rotation=False)
+    
+
+def graph_median_delay_by_line(dataset):
+    data = read_dataset(dataset)
+    organized_data = {}
+    for row in data:
+        line = row['line']
+        try:
+            organized_data[line].append(int(row['calculated_delay']))
+        except KeyError:
+            organized_data[line] = [int(row['calculated_delay'])]
+
+    for key in organized_data.keys():
+        organized_data[key] = int(statistics.median(organized_data[key]))
+
+    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
+
+    draw_graph(labels, values,
+               'line',
+               'median delay',
+               'Median delay by line',
+               'median_delay__line.png')
+
+
+def graph_median_delay_by_date(dataset):
+    data = read_dataset(dataset)
+    organized_data = {}
+    for row in data:
+        date = row['date']
+        try:
+            organized_data[date].append(int(row['calculated_delay']))
+        except KeyError:
+            organized_data[date] = [int(row['calculated_delay'])]
+
+    for key in organized_data.keys():
+        organized_data[key] = int(statistics.median(organized_data[key]))
+
+    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=False)
+
+    draw_graph(labels, values,
+               'date',
+               'median delay',
+               'Median delay by date',
+               'median_delay__date.png')
+
 
 def main():
     match sys.argv[1]:
@@ -221,6 +265,10 @@ def main():
             graph_punctuality(sys.argv[2][2:])
         case '--punctuality-percent':
             graph_punctuality_percentage(sys.argv[2][2:])
+        case '--median-delay-line':
+            graph_median_delay_by_line(sys.argv[2][2:])
+        case '--median-delay-date': 
+            graph_median_delay_by_date(sys.argv[2][2:])
         case _:
             print("Invalid command. Try again.")
             print("Refer to README.md for possible options.")
