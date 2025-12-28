@@ -24,6 +24,8 @@ jobs:
           set -e
 
           git fetch origin
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if git show-ref --verify --quiet refs/remotes/origin/data; then
             echo "Data branch exists"
