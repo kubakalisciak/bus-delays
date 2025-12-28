@@ -76,7 +76,7 @@ def draw_graph(labels, values,
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
 
-    if min(map(int, values)) > 0:
+    if min(map(float, values)) >= 0:
         axis.set_ylim(bottom=0)
 
     if rotation:

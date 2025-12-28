@@ -113,7 +113,8 @@ def graph_average_delays_by_day(dataset):
                'date',
                'average delay',
                'Average delay by date',
-               'avg_delay__date.png')
+               'avg_delay__date.png',
+               style='line')
     
 
 def graph_punctuality(dataset):
@@ -136,7 +137,8 @@ def graph_punctuality(dataset):
                'Amount of punctual rides',
                'punctuality.png',
                color_mapping=mapping,
-               rotation=False)
+               rotation=False,
+               style='scatter')
 
 
 def graph_punctuality_percentage(dataset):
@@ -186,7 +188,8 @@ def graph_median_delay_by_line(dataset):
                'line',
                'median delay',
                'Median delay by line',
-               'median_delay__line.png')
+               'median_delay__line.png',
+               style='scatter')
 
 
 def graph_median_delay_by_date(dataset):
@@ -208,7 +211,8 @@ def graph_median_delay_by_date(dataset):
                'date',
                'median delay',
                'Median delay by date',
-               'median_delay__date.png')
+               'median_delay__date.png',
+               style='line')
 
 
 def main():
