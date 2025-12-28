@@ -56,7 +56,7 @@ pip install -r requirements.txt
 |Flag|Graph Description|Filename|
 |---|---|---|
 |`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`|
-|`--avg-delay-day`|Average delay over the dataset by day|`avg_delay__day.png`|
+|`--avg-delay-date`|Average delay over the dataset by day|`avg_delay__date.png`|
 |`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
 |`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
 

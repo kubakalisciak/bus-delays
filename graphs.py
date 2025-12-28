@@ -16,15 +16,37 @@ def read_dataset(set_name):
     return output
 
 
-def draw_graph(labels, values, xlabel, ylabel, title, filename, rotation=True):
+def draw_graph(labels, values, xlabel, ylabel, title, filename, color_mapping=None, rotation=True):
+    """
+    Draw a bar graph with the given labels and values.
+
+    Parameters:
+    labels (list[str]): The labels for the bars in the graph.
+    values (list[int]): The values for the bars in the graph.
+    xlabel (str): The label for the x-axis.
+    ylabel (str): The label for the y-axis.
+    title (str): The title for the graph.
+    filename (str): The filename for the graph.
+    color_mapping (dict[str, str], optional): A dictionary mapping labels to colors. Defaults to None.
+    rotation (bool, optional): Whether to rotate the x-axis labels by 90 degrees. Defaults to True.
+
+    Returns:
+    None
+    """
     dir_name = 'graphs'
     os.makedirs(dir_name, exist_ok=True)
 
     fig, axis = plt.subplots()
-        
-    axis.bar(labels, values)
-    axis.set_xlabel(xlabel)
-    axis.set_ylabel(ylabel)
+
+    if color_mapping:
+        colors = [color_mapping.get(label, 'gray') for label in labels]
+        axis.bar(labels, values, color=colors)
+        axis.set_xlabel(xlabel)
+        axis.set_ylabel(ylabel)
+    else:
+        axis.bar(labels, values)
+        axis.set_xlabel(xlabel)
+        axis.set_ylabel(ylabel)
 
     if min(map(int, values)) > 0:
         axis.set_ylim(bottom=0)
@@ -108,7 +130,11 @@ def graph_average_delays_by_line(dataset):
 
     labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=True)
 
-    draw_graph(labels, values, 'linia', 'średnie opóźnienie', 'wykres1', 'avg_delay__line.png')
+    draw_graph(labels, values,
+               'line',
+               'average delay',
+               'Average delay by line',
+               'avg_delay__line.png')
 
 
 def graph_average_delays_by_day(dataset):
@@ -128,7 +154,11 @@ def graph_average_delays_by_day(dataset):
     labels, values = sort_by_labels(avg_delays, value_as_num=True)
     values = [round(x, 2) for x in values]
 
-    draw_graph(labels, values, 'dzień', 'średnie opóźnienie', 'wykres2', 'avg_delay__day.png')
+    draw_graph(labels, values,
+               'date',
+               'average delay',
+               'Average delay by date',
+               'avg_delay__date.png')
 
 
 def graph_punctuality(dataset):
@@ -137,7 +167,21 @@ def graph_punctuality(dataset):
     labels = [x.replace('_', ' ') for x in collected_data.keys()]
     values = collected_data.values()
 
-    draw_graph(labels, values, '', 'no. of rides', 'wykres3', 'punctuality.png', rotation=False)
+    mapping = {
+        'too early': 'red',
+        'early': 'orange',
+        'on time': 'blue',
+        'late': 'orange',
+        'too late': 'red'
+    }
+
+    draw_graph(labels, values,
+               '',
+               'no. of rides',
+               'Amount of punctual rides',
+               'punctuality.png',
+               color_mapping=mapping,
+               rotation=False)
 
 
 def graph_punctuality_percentage(dataset):
@@ -151,13 +195,27 @@ def graph_punctuality_percentage(dataset):
     for i in range(len(values)):
         values[i] = (values[i] / amount_of_rides) * 100
 
-    draw_graph(labels, values, '', '% of rides', 'wykres3', 'punctuality_percent.png', rotation=False)
+    mapping = {
+        'too early': 'red',
+        'early': 'orange',
+        'on time': 'blue',
+        'late': 'orange',
+        'too late': 'red'
+    }
+    
+    draw_graph(labels, values, 
+               '', 
+               '% of rides', 
+               '% of punctual rides', 
+               'punctuality_percent.png', 
+               color_mapping=mapping, 
+               rotation=False)
 
 def main():
     match sys.argv[1]:
         case '--avg-delay-line':
             graph_average_delays_by_line(sys.argv[2][2:])
-        case '--avg-delay-day':
+        case '--avg-delay-date':
             graph_average_delays_by_day(sys.argv[2][2:])
         case '--punctuality':  
             graph_punctuality(sys.argv[2][2:])
