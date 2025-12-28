@@ -31,6 +31,9 @@ jobs:
       - name: generate or append CSV
         id: generate_csv
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           # Ensure output directory exists
           mkdir -p output
 
