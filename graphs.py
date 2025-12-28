@@ -4,11 +4,7 @@ import os, csv, sys, statistics
 
 def read_dataset(set_name):
     dir_name = 'output'
-<<<<<<< HEAD
-    filepath = os.path.join(dir_name, filename[2:])
-=======
     filepath = os.path.join(dir_name, f"{set_name}.csv")
->>>>>>> 595f4d7e39499297340870a7aa44ce7ae45ba537
     output = []
     try:
         with open(filepath, 'r') as file:
@@ -20,33 +16,7 @@ def read_dataset(set_name):
     return output
 
 
-<<<<<<< HEAD
-def draw_graph(labels, values, xlabel, ylabel, title, filename):
-    dir_name = 'graphs'
-    os.makedirs(dir_name, exist_ok=True)
-
-    fig, axis = plt.subplots()
-        
-    axis.bar(labels, values)
-    axis.set_xlabel(xlabel)
-    axis.set_ylabel(ylabel)
-
-    if min(values, default=0) > 0:
-        axis.set_ylim(bottom=0)
-
-    axis.set_title(title)
-    axis.tick_params(axis='x', rotation=90)
-    axis.grid(axis='x', linestyle='-', alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(dir_name, filename))
-    plt.close()
-
-
-def prepare_graph_items(data, value_as_num=False, key_as_num=False):
-=======
 def sort_by_labels(data, value_as_num=False, key_as_num=False):
->>>>>>> 595f4d7e39499297340870a7aa44ce7ae45ba537
     if key_as_num:
         dict_keys = data.keys()
         int_keys_data = {}
