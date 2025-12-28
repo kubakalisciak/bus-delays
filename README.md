@@ -1,14 +1,18 @@
 # bus-delay-inator
-A quirky project gathering data on delays of buss in my hometown (Białystok) and working with those data. Also a kind of exercise in matplotlib and Github Actions.
+
+A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also a kind of exercise in matplotlib and Github Actions.
 
 ## Features
+
 - Polling data
-- Automatic polling every X minutes via Github Actions
+- Automatic polling every 10 minutes via Github Actions
 - Making graphs
 - And many more to come…
 
 ## Installation
+
 Clone the repository and install dependencies (example uses pip and a virtualenv):
+
 ```bash
 git clone https://github.com/kubakalisciak/bus-delays.git
 cd bus-delays
@@ -24,6 +28,7 @@ pip install -r requirements.txt
      - This repository includes a scheduled GitHub Action (see `.github/workflows/fetch.yml`) that runs every 10 minutes and can be run manually. The workflow runs `api.py`, appends/deduplicates `output/output.csv` and pushes the result to a branch named `data`.
 
      - To get the latest CSV locally you can merge the `data` branch into `main`:
+
          ```bash
          git fetch origin
          git checkout main
@@ -31,6 +36,7 @@ pip install -r requirements.txt
          ```
 
      - If you don't want to merge the branch into `main`, fetch just the CSV file from the remote `data` branch:
+
          ```bash
          git fetch origin
          mkdir -p output
@@ -49,10 +55,16 @@ pip install -r requirements.txt
 
 |Flag|Graph Description|Filename|
 |---|---|---|
-|`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`
-`--avg-delay-day`|Average delay over the dataset by day|`avg_delay__day.png`
+|`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`|
+|`--avg-delay-date`|Average delay over the dataset by date|`avg_delay__date.png`|
+|`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
+|`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
+|`--median-delay-line`|Median delay over the dataset by line|`median_delay__line.png`|
+|`--median-delay-date`|Median delay over the dataset by date|`median_delay__date.png`|
 
-  - Pick the dataset (*monthly*) (the 2nd flag)
+
+    - Pick the dataset (*monthly*) (the 2nd flag)
+
     - Format: `--YYYY-MM`, where `YYYY` is the full year number and `MM` the zero-padded month number
 
 Examples:
@@ -62,24 +74,29 @@ python graphs.py --avg-delay-line --2025-12
 
 python graphs.py --avg-delay-day --2026-02
 ```
+
 3. Access the graphs
 
      - The generated images are saved in `graphs/`. List or open them with your OS image viewer:
+
          ```bash
          ls graphs/
          xdg-open graphs/avg_delay__line.png
          ```
 
 ## To-Do's
-- [ ] Gather the artifacts from Github Actions
+
 - [ ] Add more graphs
-    - Average delays by tme of day
+    - Average delays by time of day
     - Most delayed lines/vehicles
     - Trends over days, weeks etc.
-    - How much on time, delayed, early etc.
+    - ~~How much on time, delayed, early etc.~~
+    - Median delays
 - [ ] Add some ML capabilities
-- [ ] Add a 'Usage' section to the README
+- [ ] Add a flag to use all datasets
+- [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
 
 ## License
+
 This project is licensed under the [GPL v3.0 License](LICENSE)
