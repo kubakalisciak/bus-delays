@@ -14,11 +14,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout data branch
+      - name: Checkout repository (main by default)
         uses: actions/checkout@v4
         with:
-          ref: data
           fetch-depth: 0
+
+      - name: Ensure data branch exists and switch to it
+        run: |
+          set -e
+
+          git fetch origin
+
+          if git show-ref --verify --quiet refs/remotes/origin/data; then
+            echo "Data branch exists"
+            git checkout data
+          else
+            echo "Creating data branch"
+            git checkout --orphan data
+            git rm -rf .
+            git commit --allow-empty -m "Initialize data branch"
+            git push origin data
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -43,7 +59,7 @@ jobs:
           git add output/*.csv
 
           if git diff --cached --quiet; then
-            echo "No new data"
+            echo "No new data to commit"
           else
             git commit -m "ACTIONS: append new data"
             git push origin data
