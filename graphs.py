@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import os, csv, sys
 
 
-def read_dataset(filename):
+def read_dataset(set_name):
     dir_name = 'output'
-    filepath = os.path.join(dir_name, filename)
+    filepath = os.path.join(dir_name, f"{set_name}.csv")
     output = []
     try:
         with open(filepath, 'r') as file:
@@ -16,7 +16,7 @@ def read_dataset(filename):
     return output
 
 
-def draw_graph(labels, values, xlabel, ylabel, title, filename):
+def draw_graph(labels, values, xlabel, ylabel, title, filename, rotation=True):
     dir_name = 'graphs'
     os.makedirs(dir_name, exist_ok=True)
 
@@ -26,11 +26,12 @@ def draw_graph(labels, values, xlabel, ylabel, title, filename):
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
 
-    if min(values) > 0:
+    if min(map(int, values)) > 0:
         axis.set_ylim(bottom=0)
 
     axis.set_title(title)
-    axis.tick_params(axis='x', rotation=90)
+    if rotation:
+        axis.tick_params(axis='x', rotation=90)
     axis.grid(axis='x', linestyle='-', alpha=0.3)
 
     plt.tight_layout()
@@ -38,7 +39,7 @@ def draw_graph(labels, values, xlabel, ylabel, title, filename):
     plt.close()
 
 
-def prepare_graph_items(data, value_as_num=False, key_as_num=False):
+def sort_by_labels(data, value_as_num=False, key_as_num=False):
     if key_as_num:
         dict_keys = data.keys()
         int_keys_data = {}
@@ -66,9 +67,34 @@ def calculate_average_delays(count, summed_delays):
     return avg_delays
 
 
+def calculate_punctuality_status(dataset):
+    collected_data = {'too_early': 0,
+                        'early': 0,
+                        'on_time': 0,
+                        'late': 0,
+                        'too_late': 0}
+    data = read_dataset(dataset)
+    for row in data:
+        if int(row['calculated_delay']) <= -3:
+            collected_data['too_early'] += 1
+        elif int(row['calculated_delay']) < 0:
+            collected_data['early'] += 1
+        elif int(row['calculated_delay']) == 0:
+            collected_data['on_time'] += 1
+        elif int(row['calculated_delay']) < 3:
+            collected_data['late'] += 1
+        else:
+            collected_data['too_late'] += 1
+
+    return collected_data
+
+
+# ================================
+
+
 def graph_average_delays_by_line(dataset):
     count, summed_delays = {}, {}
-    data = read_dataset(f"{dataset}.csv")
+    data = read_dataset(dataset)
     for row in data:
         line = row['line']
         try:
@@ -80,14 +106,14 @@ def graph_average_delays_by_line(dataset):
 
     avg_delays = calculate_average_delays(count, summed_delays)
 
-    labels, values = prepare_graph_items(avg_delays, value_as_num=True, key_as_num=True)
+    labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values, 'linia', 'średnie opóźnienie', 'wykres1', 'avg_delay__line.png')
 
 
 def graph_average_delays_by_day(dataset):
     count, summed_delays = {}, {}
-    data = read_dataset(f"{dataset}.csv")
+    data = read_dataset(dataset)
     for row in data:
         date = row['date']
         try:
@@ -99,18 +125,44 @@ def graph_average_delays_by_day(dataset):
 
     avg_delays = calculate_average_delays(count, summed_delays)
 
-    labels, values = prepare_graph_items(avg_delays, value_as_num=True)
+    labels, values = sort_by_labels(avg_delays, value_as_num=True)
     values = [round(x, 2) for x in values]
 
     draw_graph(labels, values, 'dzień', 'średnie opóźnienie', 'wykres2', 'avg_delay__day.png')
 
 
+def graph_punctuality(dataset):
+    collected_data = calculate_punctuality_status(dataset)
+
+    labels = [x.replace('_', ' ') for x in collected_data.keys()]
+    values = collected_data.values()
+
+    draw_graph(labels, values, '', 'no. of rides', 'wykres3', 'punctuality.png', rotation=False)
+
+
+def graph_punctuality_percentage(dataset):
+    collected_data = calculate_punctuality_status(dataset)
+
+    labels = [x.replace('_', ' ') for x in collected_data.keys()]
+    values = list(collected_data.values())
+    
+    amount_of_rides = sum(values)
+
+    for i in range(len(values)):
+        values[i] = (values[i] / amount_of_rides) * 100
+
+    draw_graph(labels, values, '', '% of rides', 'wykres3', 'punctuality_percent.png', rotation=False)
+
 def main():
     match sys.argv[1]:
         case '--avg-delay-line':
-            graph_average_delays_by_line(sys.argv[2])
+            graph_average_delays_by_line(sys.argv[2][2:])
         case '--avg-delay-day':
-            graph_average_delays_by_day(sys.argv[2])
+            graph_average_delays_by_day(sys.argv[2][2:])
+        case '--punctuality':  
+            graph_punctuality(sys.argv[2][2:])
+        case '--punctuality-percent':
+            graph_punctuality_percentage(sys.argv[2][2:])
         case _:
             print("Invalid command. Try again.")
             print("Refer to README.md for possible options.")
