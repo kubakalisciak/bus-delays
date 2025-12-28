@@ -14,30 +14,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository (main by default)
+      # 1️⃣ Checkout MAIN (workflow source)
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Ensure data branch exists and switch to it
+      # 2️⃣ Ensure data branch exists (NORMAL branch, based on main)
+      - name: Ensure data branch exists
         run: |
           set -e
 
           git fetch origin
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if git show-ref --verify --quiet refs/remotes/origin/data; then
-            echo "Data branch exists"
-            git checkout data
+            echo "data branch exists"
           else
-            echo "Creating data branch"
-            git checkout --orphan data
-            git rm -rf .
-            git commit --allow-empty -m "Initialize data branch"
+            echo "Creating data branch from main"
+            git checkout -b data
             git push origin data
+            git checkout main
           fi
 
+      # 3️⃣ Switch to data branch (work happens here)
+      - name: Switch to data branch
+        run: git checkout data
+
+      # 4️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -46,22 +49,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run data fetch script
+      # 5️⃣ Run script (appends data)
+      - name: Run fetch script
         run: |
           mkdir -p output
           python api.py
 
-      - name: Commit and push changes
+      # 6️⃣ Commit and push ONLY data
+      - name: Commit and push data
         run: |
-          set -euo pipefail
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add output/*.csv
 
           if git diff --cached --quiet; then
-            echo "No new data to commit"
+            echo "No new data"
           else
             git commit -m "ACTIONS: append new data"
             git push origin data
