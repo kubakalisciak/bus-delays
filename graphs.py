@@ -137,8 +137,7 @@ def graph_punctuality(dataset):
                'Amount of punctual rides',
                'punctuality.png',
                color_mapping=mapping,
-               rotation=False,
-               style='scatter')
+               rotation=False)
 
 
 def graph_punctuality_percentage(dataset):
