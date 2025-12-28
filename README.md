@@ -96,6 +96,7 @@ python graphs.py --avg-delay-day --2026-02
 - [ ] Add a flag to use all datasets
 - [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
+- [ ] Add daily or bidaily merges of `data` to `main`
 
 ## License
 
