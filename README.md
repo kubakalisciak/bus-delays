@@ -1,11 +1,11 @@
 # bus-delay-inator
 
-A quirky project gathering data on delays of buses in my hometown (Białystok) and working with those data. Also a kind of exercise in matplotlib and Github Actions.
+A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also a kind of exercise in matplotlib and Github Actions.
 
 ## Features
 
 - Polling data
-- Automatic polling every X minutes via Github Actions
+- Automatic polling every 10 minutes via Github Actions
 - Making graphs
 - And many more to come…
 
