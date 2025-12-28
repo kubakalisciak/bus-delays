@@ -71,14 +71,14 @@ python graphs.py --avg-delay-day --2026-02
          ```
 
 ## To-Do's
-- [ ] Gather the artifacts from Github Actions
 - [ ] Add more graphs
     - Average delays by tme of day
     - Most delayed lines/vehicles
     - Trends over days, weeks etc.
     - How much on time, delayed, early etc.
 - [ ] Add some ML capabilities
-- [ ] Add a 'Usage' section to the README
+- [ ] Add a flag to use all datasets
+- [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
 
 ## License
