@@ -40,12 +40,12 @@ jobs:
           # Run Python script — it handles appending internally
           python api.py
 
-          # Switch back to the main branch
-          git switch main
-
           # Commit local changes before switching to "data" branch
           git add .
           git commit -m "Committing local changes before switching to data branch"
+
+          # Switch back to the main branch
+          git switch main
 
       - name: commit and push to "data" branch
         run: |
