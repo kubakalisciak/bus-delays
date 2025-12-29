@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Obtain the latest CSV data (updated by GitHub Actions)
+1. **Obtain the latest CSV data (updated by GitHub Actions)**
 
 - This repository includes a scheduled GitHub Action (see `.github/workflows/fetch.yml`) that runs every 10 minutes and can be run manually. The workflow runs `api.py`, appends/deduplicates `output/output.csv` and pushes the result to a branch named `data`.
 
@@ -47,7 +47,7 @@ pip install -r requirements.txt
 
  - Notes: the workflow commits and pushes to the `data` branch (it may force-push). Pulling the single CSV file is safer than merging the entire branch if you only want the artifact.
 
-2. Generate graphs
+2. **Generate the graphs**
 
 - Run graphs.py to generate graphs from the CSV. The images are saved in the graphs/ directory.
 
@@ -74,7 +74,7 @@ python graphs.py --avg-delay-line --2025-12
 python graphs.py --avg-delay-day --2026-02
 ```
 
-3. Access the graphs
+3. **Access the graphs**
 
 - The generated images are saved in `graphs/`. List or open them with your OS image viewer:
 
