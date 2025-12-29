@@ -40,7 +40,7 @@ git merge origin/data
 ```bash
 git fetch origin
 mkdir -p output
-git show origin/data:output/output.csv > output/output.csv
+git show origin/data:output/[dataset-name].csv > output/[dataset-name].csv
 ```
 
  - To force an immediate update, trigger the workflow manually from the repository's Actions tab (or use `workflow_dispatch`). After the job finishes, fetch the `data` branch as above.
