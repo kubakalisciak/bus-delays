@@ -29,19 +29,19 @@ pip install -r requirements.txt
 
 - To get the latest CSV locally you can merge the `data` branch into `main`:
 
-         ```bash
-         git fetch origin
-         git checkout main
-         git merge origin/data
-         ```
+```bash
+git fetch origin
+git checkout main
+git merge origin/data
+```
 
  - If you don't want to merge the branch into `main`, fetch just the CSV file from the remote `data` branch:
 
-         ```bash
-         git fetch origin
-         mkdir -p output
-         git show origin/data:output/output.csv > output/output.csv
-         ```
+```bash
+git fetch origin
+mkdir -p output
+git show origin/data:output/output.csv > output/output.csv
+```
 
  - To force an immediate update, trigger the workflow manually from the repository's Actions tab (or use `workflow_dispatch`). After the job finishes, fetch the `data` branch as above.
 
@@ -78,10 +78,10 @@ python graphs.py --avg-delay-day --2026-02
 
 - The generated images are saved in `graphs/`. List or open them with your OS image viewer:
 
-         ```bash
-         ls graphs/
-         xdg-open graphs/avg_delay__line.png
-         ```
+```bash
+ls graphs/
+xdg-open graphs/avg_delay__line.png
+```
 
 ## To-Do's
 
@@ -95,7 +95,6 @@ python graphs.py --avg-delay-day --2026-02
 - [ ] Add a flag to use all datasets
 - [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
-- [ ] Add daily or bidaily merges of `data` to `main`
 
 ## License
 
