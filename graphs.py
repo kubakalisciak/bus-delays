@@ -44,13 +44,12 @@ def calculate_average_delays(count, summed_delays):
     return avg_delays
 
 
-def calculate_punctuality_status(dataset):
+def calculate_punctuality_status(data):
     collected_data = {'too_early': 0,
                         'early': 0,
                         'on_time': 0,
                         'late': 0,
                         'too_late': 0}
-    data = read_dataset(dataset)
     for row in data:
         if int(row['calculated_delay']) <= -3:
             collected_data['too_early'] += 1
@@ -66,12 +65,34 @@ def calculate_punctuality_status(dataset):
     return collected_data
 
 
+def read_all_datasets():
+    dir_name = 'output'
+    files = os.listdir(dir_name)
+    data = []
+    for file in files:
+        filepath = os.path.join(dir_name, file)
+        with open(filepath, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                data.append(row)
+
+    return data
+
+
+def compute_all_graphs(data):
+    graph_average_delays_by_line(data)
+    graph_median_delay_by_line(data)
+    graph_average_delays_by_day(data)
+    graph_median_delay_by_date(data)
+    graph_punctuality(data)
+    graph_punctuality_percentage(data)
+
+    
 # ================================
 
 
-def graph_average_delays_by_line(dataset):
+def graph_average_delays_by_line(data):
     count, summed_delays = {}, {}
-    data = read_dataset(dataset)
     for row in data:
         line = row['line']
         try:
@@ -92,9 +113,8 @@ def graph_average_delays_by_line(dataset):
                'avg_delay__line.png')
 
 
-def graph_average_delays_by_day(dataset):
+def graph_average_delays_by_day(data):
     count, summed_delays = {}, {}
-    data = read_dataset(dataset)
     for row in data:
         date = row['date']
         try:
@@ -117,8 +137,8 @@ def graph_average_delays_by_day(dataset):
                style='line')
     
 
-def graph_punctuality(dataset):
-    collected_data = calculate_punctuality_status(dataset)
+def graph_punctuality(data):
+    collected_data = calculate_punctuality_status(data)
 
     labels = [x.replace('_', ' ') for x in collected_data.keys()]
     values = collected_data.values()
@@ -140,8 +160,8 @@ def graph_punctuality(dataset):
                rotation=False)
 
 
-def graph_punctuality_percentage(dataset):
-    collected_data = calculate_punctuality_status(dataset)
+def graph_punctuality_percentage(data):
+    collected_data = calculate_punctuality_status(data)
 
     labels = [x.replace('_', ' ') for x in collected_data.keys()]
     values = list(collected_data.values())
@@ -168,8 +188,7 @@ def graph_punctuality_percentage(dataset):
                rotation=False)
     
 
-def graph_median_delay_by_line(dataset):
-    data = read_dataset(dataset)
+def graph_median_delay_by_line(data):
     organized_data = {}
     for row in data:
         line = row['line']
@@ -191,8 +210,7 @@ def graph_median_delay_by_line(dataset):
                style='scatter')
 
 
-def graph_median_delay_by_date(dataset):
-    data = read_dataset(dataset)
+def graph_median_delay_by_date(data):
     organized_data = {}
     for row in data:
         date = row['date']
@@ -215,22 +233,29 @@ def graph_median_delay_by_date(dataset):
 
 
 def main():
-    match sys.argv[1]:
-        case '--avg-delay-line':
-            graph_average_delays_by_line(sys.argv[2][2:])
-        case '--avg-delay-date':
-            graph_average_delays_by_day(sys.argv[2][2:])
-        case '--punctuality':  
-            graph_punctuality(sys.argv[2][2:])
-        case '--punctuality-percent':
-            graph_punctuality_percentage(sys.argv[2][2:])
-        case '--median-delay-line':
-            graph_median_delay_by_line(sys.argv[2][2:])
-        case '--median-delay-date': 
-            graph_median_delay_by_date(sys.argv[2][2:])
-        case _:
-            print("Invalid command. Try again.")
-            print("Refer to README.md for possible options.")
+    graph_name = sys.argv[1]
+    dataset_name = sys.argv[2][2:]
+    if dataset_name == 'all':
+        data = read_all_datasets()
+    else:
+        data = read_dataset(dataset_name)
+
+    graph_functions = {
+        '--avg-delay-line': graph_average_delays_by_line,
+        '--median-delay-line': graph_median_delay_by_line,
+        '--avg-delay-date': graph_average_delays_by_day,
+        '--median-delay-date': graph_median_delay_by_date,
+        '--punctuality': graph_punctuality,
+        '--punctuality-percent': graph_punctuality_percentage,
+        '--recompute': compute_all_graphs
+    }
+
+    if graph_name in graph_functions:
+        graph_functions[graph_name](data)
+    else:
+        print(f"Invalid command: {graph_name}. Try again.")
+        print("Refer to README.md for possible options.")
+
 
 
 if __name__ == "__main__":

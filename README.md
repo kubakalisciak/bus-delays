@@ -42,15 +42,10 @@ git fetch origin
 mkdir -p output
 git show origin/data:output/output.csv > output/output.csv
 ```
-- Or you can just switch to `data` and run the script there
-```bash
-git checkout data
-python graphs.py --flag1 --flag2
-```
 
-     - To force an immediate update, trigger the workflow manually from the repository's Actions tab (or use `workflow_dispatch`). After the job finishes, fetch the `data` branch as above.
+- To force an immediate update, trigger the workflow manually from the repository's Actions tab (or use `workflow_dispatch`). After the job finishes, fetch the `data` branch as above.
 
-     - Notes: the workflow commits and pushes to the `data` branch (it may force-push). Pulling the single CSV file is safer than merging the entire branch if you only want the artifact.
+- Notes: the workflow commits and pushes to the `data` branch (it may force-push). Pulling the single CSV file is safer than merging the entire branch if you only want the artifact.
 
 2. Generate graphs
 
@@ -60,6 +55,7 @@ python graphs.py --flag1 --flag2
 
 |Flag|Graph Description|Filename|
 |---|---|---|
+|`--recompute`|Draw all the graphs|respective names of each graph|
 |`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`|
 |`--avg-delay-date`|Average delay over the dataset by date|`avg_delay__date.png`|
 |`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
@@ -70,7 +66,7 @@ python graphs.py --flag1 --flag2
 
 - Pick the dataset (*monthly*) (the 2nd flag)
 
-- Format: `--YYYY-MM`, where `YYYY` is the full year number and `MM` the zero-padded month number
+- Format: `--YYYY-MM`, where `YYYY` is the full year number and `MM` the zero-padded month number or `--all` to access all datasets
 
 Examples:
 
@@ -96,9 +92,9 @@ xdg-open graphs/avg_delay__line.png
     - Most delayed lines/vehicles
     - Trends over days, weeks etc.
     - ~~How much on time, delayed, early etc.~~
-    - Median delays
+    - ~~Median delays~~
 - [ ] Add some ML capabilities
-- [ ] Add a flag to use all datasets
+- [x] Add a flag to use all datasets and recompute all graphs
 - [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
 
