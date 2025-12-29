@@ -36,14 +36,6 @@ def sort_by_labels(data, value_as_num=False, key_as_num=False):
     return labels, values
 
 
-def calculate_average_delays(count, summed_delays):
-    avg_delays = {}
-    for i in count.keys():
-        avg_delays[i] = summed_delays[i] / count[i]
-
-    return avg_delays
-
-
 def calculate_punctuality_status(data):
     collected_data = {'too_early': 0,
                         'early': 0,
@@ -86,8 +78,10 @@ def compute_all_graphs(data):
     graph_median_delay_by_date(data)
     graph_punctuality(data)
     graph_punctuality_percentage(data)
+    graph_average_delay_by_time_of_day(data)
+    graph_median_delay_by_time_of_day(data)
 
-    
+
 # ================================
 
 
@@ -102,8 +96,8 @@ def graph_average_delays_by_line(data):
             count[line] = 1
             summed_delays[line] = int(row['calculated_delay'])
 
-    avg_delays = calculate_average_delays(count, summed_delays)
-
+    avg_delays = {line: value / count[line] for line, value in summed_delays.items()}
+    
     labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values,
@@ -111,6 +105,28 @@ def graph_average_delays_by_line(data):
                'average delay',
                'Average delay by line',
                'avg_delay__line.png')
+
+
+def graph_median_delay_by_line(data):
+    organized_data = {}
+    for row in data:
+        line = row['line']
+        try:
+            organized_data[line].append(int(row['calculated_delay']))
+        except KeyError:
+            organized_data[line] = [int(row['calculated_delay'])]
+
+    for key in organized_data.keys():
+        organized_data[key] = int(statistics.median(organized_data[key]))
+
+    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
+
+    draw_graph(labels, values,
+               'line',
+               'median delay',
+               'Median delay by line',
+               'median_delay__line.png',
+               style='bar')
 
 
 def graph_average_delays_by_day(data):
@@ -124,16 +140,37 @@ def graph_average_delays_by_day(data):
             count[date] = 1
             summed_delays[date] = int(row['calculated_delay'])
 
-    avg_delays = calculate_average_delays(count, summed_delays)
-
-    labels, values = sort_by_labels(avg_delays, value_as_num=True)
-    values = [round(x, 2) for x in values]
+    avg_delays = {date: value / count[date] for date, value in summed_delays.items()}
+    
+    labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=False)
 
     draw_graph(labels, values,
                'date',
                'average delay',
                'Average delay by date',
                'avg_delay__date.png',
+               style='line')
+
+
+def graph_median_delay_by_date(data):
+    organized_data = {}
+    for row in data:
+        date = row['date']
+        try:
+            organized_data[date].append(int(row['calculated_delay']))
+        except KeyError:
+            organized_data[date] = [int(row['calculated_delay'])]
+
+    for key in organized_data.keys():
+        organized_data[key] = int(statistics.median(organized_data[key]))
+
+    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=False)
+
+    draw_graph(labels, values,
+               'date',
+               'median delay',
+               'Median delay by date',
+               'median_delay__date.png',
                style='line')
     
 
@@ -188,47 +225,54 @@ def graph_punctuality_percentage(data):
                rotation=False)
     
 
-def graph_median_delay_by_line(data):
+def graph_average_delay_by_time_of_day(data):
     organized_data = {}
-    for row in data:
-        line = row['line']
-        try:
-            organized_data[line].append(int(row['calculated_delay']))
-        except KeyError:
-            organized_data[line] = [int(row['calculated_delay'])]
+    if not data:
+        return
 
-    for key in organized_data.keys():
-        organized_data[key] = int(statistics.median(organized_data[key]))
+    for row in data:
+        hour = row['time']
+        if hour:
+            hour = int(hour.split(':')[0])
+            try:
+                organized_data[str(hour)].append(int(row['calculated_delay']))
+            except KeyError:
+                organized_data[str(hour)] = [int(row['calculated_delay'])]
+
+    for row in organized_data:
+        organized_data[row] = float(statistics.mean(organized_data[row]))
 
     labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values,
-               'line',
-               'median delay',
-               'Median delay by line',
-               'median_delay__line.png',
-               style='scatter')
+               'hour of day',
+               'average delay',
+               'Average delay by hour of day',
+               'avg_delay__time.png',
+               style='line')
 
 
-def graph_median_delay_by_date(data):
+def graph_median_delay_by_time_of_day(data):
     organized_data = {}
     for row in data:
-        date = row['date']
-        try:
-            organized_data[date].append(int(row['calculated_delay']))
-        except KeyError:
-            organized_data[date] = [int(row['calculated_delay'])]
+        hour = row['time']
+        if hour:
+                hour = int(hour.split(':')[0])
+                try:
+                    organized_data[str(hour)].append(int(row['calculated_delay']))
+                except KeyError:
+                    organized_data[str(hour)] = [int(row['calculated_delay'])]
 
-    for key in organized_data.keys():
-        organized_data[key] = int(statistics.median(organized_data[key]))
+    for row in organized_data:
+        organized_data[row] = float(statistics.median(organized_data[row]))
 
-    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=False)
+    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values,
-               'date',
+               'hour of day',
                'median delay',
-               'Median delay by date',
-               'median_delay__date.png',
+               'Median delay by hour of day',
+               'median_delay__time.png',
                style='line')
 
 
@@ -247,6 +291,8 @@ def main():
         '--median-delay-date': graph_median_delay_by_date,
         '--punctuality': graph_punctuality,
         '--punctuality-percent': graph_punctuality_percentage,
+        '--avg-delay-time': graph_average_delay_by_time_of_day,
+        '--median-delay-time': graph_median_delay_by_time_of_day,
         '--recompute': compute_all_graphs
     }
 

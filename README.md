@@ -88,7 +88,7 @@ xdg-open graphs/avg_delay__line.png
 ## To-Do's
 
 - [ ] Add more graphs
-    - Average delays by time of day
+    - ~~Average delays by time of day~~
     - Most delayed lines/vehicles
     - Trends over days, weeks etc.
     - ~~How much on time, delayed, early etc.~~
