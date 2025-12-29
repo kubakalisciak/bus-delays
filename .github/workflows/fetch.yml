@@ -2,73 +2,70 @@ name: fetch
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # runs every 10 minutes
-  workflow_dispatch:  # allows manual trigger
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
 
 concurrency:
   group: fetch-data
-  cancel-in-progress: true  # prevents overlapping runs
+  cancel-in-progress: true
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout repository
+      # 1️⃣ Checkout MAIN (workflow source)
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed for force push
+          fetch-depth: 0
 
-      - name: set up Python
+      # 2️⃣ Ensure data branch exists (NORMAL branch, based on main)
+      - name: Ensure data branch exists
+        run: |
+          set -e
+
+          git fetch origin
+
+          if git show-ref --verify --quiet refs/remotes/origin/data; then
+            echo "data branch exists"
+          else
+            echo "Creating data branch from main"
+            git checkout -b data
+            git push origin data
+            git checkout main
+          fi
+
+      # 3️⃣ Switch to data branch (work happens here)
+      - name: Switch to data branch
+        run: git checkout data
+
+      # 4️⃣ Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: generate or append CSV
-        id: generate_csv
+      # 5️⃣ Run script (appends data)
+      - name: Run fetch script
         run: |
-          # Ensure output directory exists
           mkdir -p output
-
-          # Switch to the "data" branch
-          git switch data || git switch -c data
-
-          # Run Python script — it handles appending internally
           python api.py
 
-          # Switch back to the main branch
-          git switch main
-
-      - name: commit and push to "data" branch
+      # 6️⃣ Commit and push ONLY data
+      - name: Commit and push data
         run: |
-          set -euo pipefail
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Fetch the data branch if it exists
-          git fetch origin data || true
+          git add output/*.csv
 
-          # Switch to data branch or create it
-          git switch data || git switch -c data
-
-          # Recompute CSV_FILE if not set
-          CSV_FILE="${CSV_FILE:-$(python -c "from datetime import datetime; print(\"output/\" + datetime.now().strftime('%Y-%m') + \".csv\")")}"
-
-          # Ensure output directory exists
-          mkdir -p output
-
-          # Add CSV file
-          git add "$CSV_FILE" || true
-
-          # Commit only if changes exist
           if git diff --cached --quiet; then
-            echo "No new data to commit"
+            echo "No new data"
           else
             git commit -m "ACTIONS: append new data"
-            git push --force-with-lease origin data
+            git push origin data
           fi
