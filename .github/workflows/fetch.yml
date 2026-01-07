@@ -2,7 +2,7 @@ name: fetch
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -14,13 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout MAIN (workflow source)
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2️⃣ Ensure data branch exists (NORMAL branch, based on main)
       - name: Ensure data branch exists
         run: |
           set -e
@@ -36,11 +34,9 @@ jobs:
             git checkout main
           fi
 
-      # 3️⃣ Switch to data branch (work happens here)
       - name: Switch to data branch
         run: git checkout data
 
-      # 4️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -49,13 +45,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 5️⃣ Run script (appends data)
       - name: Run fetch script
         run: |
           mkdir -p output
           python api.py
 
-      # 6️⃣ Commit and push ONLY data
       - name: Commit and push data
         run: |
           git config user.name "github-actions[bot]"
