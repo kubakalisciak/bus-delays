@@ -9,9 +9,8 @@ A quirky project gathering data on delays of buses in my hometown (Białystok) a
 ## Features
 
 - Polling data
-- Automatic polling every 10 minutes via Github Actions
+- Automatic polling every ~5 minutes via Github Actions
 - Making graphs
-- And many more to come…
 
 ## Installation
 
@@ -26,34 +25,24 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-
-1. Obtain the latest CSV data (updated by GitHub Actions)
-
-     - This repository includes a scheduled GitHub Action (see `.github/workflows/fetch.yml`) that runs every 10 minutes and can be run manually. The workflow runs `api.py`, appends/deduplicates `output/output.csv` and pushes the result to a branch named `data`.
-
-     - To get the latest CSV locally you can merge the `data` branch into `main`:
+1. Clone the repo onto your device
 
 ```bash
-git fetch origin
-git checkout main
-git merge origin/data
+git clone https://github.com/kubakalisciak/bus-delays.git
+cd bus-delays
 ```
-
-- If you don't want to merge the branch into `main`, fetch just the CSV file from the remote `data` branch:
+*or*
+Get the latest data from the repo (new data is pushed to `main` every 3 days)
 
 ```bash
-git fetch origin
-mkdir -p output
-git show origin/data:output/[dataset-name].csv > output/[dataset-name].csv
+cd path-to-repo/bus-delays
+git fetch
+git pull
 ```
-
-- To force an immediate update, trigger the workflow manually from the repository's Actions tab (or use `workflow_dispatch`). After the job finishes, fetch the `data` branch as above.
-
-- Notes: the workflow commits and pushes to the `data` branch (it may force-push). Pulling the single CSV file is safer than merging the entire branch if you only want the artifact.
 
 2. Generate graphs
 
-   - Run graphs.py to generate graphs from the CSV. The images are saved in the graphs/ directory.
+   - Run `graphs.py` to generate graphs from the CSV. The images are saved in the `graphs` directory.
 
    - Choose the the graph type (the 1st flag):
 
@@ -75,17 +64,16 @@ git show origin/data:output/[dataset-name].csv > output/[dataset-name].csv
 Examples:
 
 ```bash
-python graphs.py --avg-delay-line --2025-12
+python graphs.py --avg-delay-line --all
 
 python graphs.py --avg-delay-day --2026-02
 ```
 
 3. Access the graphs
 
-     - The generated images are saved in `graphs/`. List or open them with your OS image viewer:
+     - The generated images are saved in `graphs`. Open them with your OS image viewer:
 
 ```bash
-ls graphs/
 xdg-open graphs/avg_delay__line.png
 ```
 
