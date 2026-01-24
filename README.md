@@ -1,5 +1,9 @@
 # bus-delay-inator
-
+![GitHub last commit](https://img.shields.io/github/last-commit/kubakalisciak/bus-delays?color=%23f78166)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kubakalisciak/bus-delays/fetch.yml?label=fetch&color=%23238636)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kubakalisciak/bus-delays/merge.yml?label=merge&color=%233572a5)
+This repo **will not be updated**.
+---
 A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also a kind of exercise in matplotlib and Github Actions.
 
 ## Features
@@ -87,13 +91,10 @@ xdg-open graphs/avg_delay__line.png
 
 ## To-Do's
 
-- [ ] Add more graphs
+- [x] Add more graphs
     - ~~Average delays by time of day~~
-    - Most delayed lines/vehicles
-    - Trends over days, weeks etc.
     - ~~How much on time, delayed, early etc.~~
     - ~~Median delays~~
-- [ ] Add some ML capabilities
 - [x] Add a flag to use all datasets and recompute all graphs
 - [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
