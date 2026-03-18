@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ```
 
 *or*  
-Get the latest data from the repo (new data is pushed to `main` every 3 days)
+1. **Get the latest data from the repo** (new data is pushed to `main` every 3 days)
 
 ```bash
 cd path-to-repo/bus-delays
