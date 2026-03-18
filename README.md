@@ -12,7 +12,7 @@ A quirky project gathering data on delays of buses in my hometown (Białystok) a
 - Making graphs
 
 ## Usage
-1. Clone the repo onto your device
+1. **Clone the repo onto your device**
 ```bash
 git clone https://github.com/kubakalisciak/bus-delays.git
 cd bus-delays
@@ -21,7 +21,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-*or*
+*or*  
 Get the latest data from the repo (new data is pushed to `main` every 3 days)
 
 ```bash
@@ -30,7 +30,7 @@ git fetch
 git pull
 ```
 
-2. Generate graphs
+2. **Generate graphs**
 
    - Run `graphs.py` to generate graphs from the CSV. The images are saved in the `graphs` directory.
 
@@ -60,9 +60,9 @@ python graphs.py --avg-delay-line --all
 python graphs.py --avg-delay-day --2026-02
 ```
 
-3. Access the graphs
+3. **Access the graphs**
 
-     - The generated images are saved in `graphs`. Open them with your OS image viewer:
+    - The generated images are saved in `graphs`. Open them with your OS image viewer:
 
 ```bash
 xdg-open graphs/avg_delay__line.png
