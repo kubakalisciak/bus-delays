@@ -86,3 +86,29 @@ def draw_graph(labels, values,
     plt.tight_layout()
     plt.savefig(os.path.join(dir_name, filename))
     plt.close()
+
+
+def draw_table(values, rows, columns, title, filename):
+    """
+    """
+    dir_name = 'graphs'
+    os.makedirs(dir_name, exist_ok=True)
+    fig, axis = plt.subplots()
+    axis.axis('off')
+
+    table = axis.table(
+        cellText=values,
+        rowLabels=rows,
+        colLabels=columns,
+        loc='center'
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+    plt.title(title)
+
+    path = os.path.join(dir_name, filename)
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+

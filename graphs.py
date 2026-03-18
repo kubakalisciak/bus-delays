@@ -1,4 +1,4 @@
-from draw import draw_graph
+from draw import draw_graph, draw_table
 import os, csv, sys, statistics
 
 
@@ -72,8 +72,7 @@ def read_all_datasets():
 
 
 def compute_all_graphs(data):
-    graph_average_delays_by_line(data)
-    graph_median_delay_by_line(data)
+    table_delays_by_line(data)
     graph_average_delays_by_day(data)
     graph_median_delay_by_date(data)
     graph_punctuality(data)
@@ -85,48 +84,31 @@ def compute_all_graphs(data):
 # ================================
 
 
-def graph_average_delays_by_line(data):
-    count, summed_delays = {}, {}
+def table_delays_by_line(data):
+    collected_data = {}
     for row in data:
         line = row['line']
         try:
-            count[line] += 1
-            summed_delays[line] += int(row['calculated_delay'])
+            collected_data[line].append(int(row['calculated_delay']))
         except KeyError:
-            count[line] = 1
-            summed_delays[line] = int(row['calculated_delay'])
+            collected_data[line] = [int(row['calculated_delay'])]
 
-    avg_delays = {line: value / count[line] for line, value in summed_delays.items()}
-    
-    labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=True)
+    lines = sorted(collected_data.keys(), key=int)
 
-    draw_graph(labels, values,
-               'line',
-               'average delay',
-               'Average delay by line',
-               'avg_delay__line.png')
+    processed_data = {}
 
+    for line in lines:
+        delays = collected_data[line]
 
-def graph_median_delay_by_line(data):
-    organized_data = {}
-    for row in data:
-        line = row['line']
-        try:
-            organized_data[line].append(int(row['calculated_delay']))
-        except KeyError:
-            organized_data[line] = [int(row['calculated_delay'])]
+        average = round(statistics.mean(delays), 2)
+        median = int(statistics.median(delays))
 
-    for key in organized_data.keys():
-        organized_data[key] = int(statistics.median(organized_data[key]))
+        processed_data[line] = [average, median]
 
-    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
+    keys = list(processed_data.keys())
+    values = list(processed_data.values())
 
-    draw_graph(labels, values,
-               'line',
-               'median delay',
-               'Median delay by line',
-               'median_delay__line.png',
-               style='bar')
+    draw_table(values, keys, ['avg', 'median'], "Delays by line", 'delays_line_table.png')
 
 
 def graph_average_delays_by_day(data):
@@ -285,8 +267,7 @@ def main():
         data = read_dataset(dataset_name)
 
     graph_functions = {
-        '--avg-delay-line': graph_average_delays_by_line,
-        '--median-delay-line': graph_median_delay_by_line,
+        '--delay-line': table_delays_by_line,
         '--avg-delay-date': graph_average_delays_by_day,
         '--median-delay-date': graph_median_delay_by_date,
         '--punctuality': graph_punctuality,

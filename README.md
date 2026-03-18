@@ -86,6 +86,7 @@ xdg-open graphs/avg_delay__line.png
 - [x] Add a flag to use all datasets and recompute all graphs
 - [x] Add a 'Usage' section to the README
 - [x] Refactor the graphing generator script to use *sys.argv*
+- [ ] Add a "Run Report" table
 
 ## License
 
