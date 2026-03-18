@@ -4,7 +4,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kubakalisciak/bus-delays/merge.yml?label=merge&color=%233572a5)  
 This repo **will not be updated**.
 - ---
-A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also a kind of exercise in matplotlib and Github Actions.
+A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also an exercise in matplotlib and Github Actions.
 
 ## Features
 
@@ -12,10 +12,8 @@ A quirky project gathering data on delays of buses in my hometown (Białystok) a
 - Automatic polling every ~5 minutes via Github Actions
 - Making graphs
 
-## Installation
-
-Clone the repository and install dependencies (example uses pip and a virtualenv):
-
+## Usage
+1. Clone the repo onto your device
 ```bash
 git clone https://github.com/kubakalisciak/bus-delays.git
 cd bus-delays
@@ -24,13 +22,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
-1. Clone the repo onto your device
-
-```bash
-git clone https://github.com/kubakalisciak/bus-delays.git
-cd bus-delays
-```
 *or*
 Get the latest data from the repo (new data is pushed to `main` every 3 days)
 
@@ -49,12 +40,13 @@ git pull
 |Flag|Graph Description|Filename|
 |---|---|---|
 |`--recompute`|Draw all the graphs|respective names of each graph|
-|`--avg-delay-line`|Average delay over the dataset by line|`avg_delay__line.png`|
 |`--avg-delay-date`|Average delay over the dataset by date|`avg_delay__date.png`|
-|`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
-|`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
-|`--median-delay-line`|Median delay over the dataset by line|`median_delay__line.png`|
+|`--avg-delay-time`|Average delay over the dataset by time of day|`avg_delay__time.png`|
+|`--delays-line`|Average and median delay over the dataset by line (in table format)|`delays__line.png`|
 |`--median-delay-date`|Median delay over the dataset by date|`median_delay__date.png`|
+|`--median-delay-time`|Median delay over the dataset by time of day|`median_delay__time.png`|
+|`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
+|`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
 
 
 - Pick the dataset (*monthly*) (the 2nd flag)
@@ -79,13 +71,6 @@ xdg-open graphs/avg_delay__line.png
 
 ## To-Do's
 
-- [x] Add more graphs
-    - ~~Average delays by time of day~~
-    - ~~How much on time, delayed, early etc.~~
-    - ~~Median delays~~
-- [x] Add a flag to use all datasets and recompute all graphs
-- [x] Add a 'Usage' section to the README
-- [x] Refactor the graphing generator script to use *sys.argv*
 - [ ] Add a "Run Report" table
 
 ## License

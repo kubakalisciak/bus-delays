@@ -2,113 +2,114 @@ import matplotlib.pyplot as plt
 import os
 
 
-def draw_graph(labels, values,
-               xlabel,
-               ylabel,
-               title,
-               filename,
-               color_mapping=None,
-               rotation=True,
-               style='bar'):
-
+def draw_graph(
+    labels,
+    values,
+    xlabel,
+    ylabel,
+    title,
+    filename,
+    color_mapping=None,
+    rotation=True,
+    style='bar'
+):
     """
-    Draw a graph with given labels and values.
+    Draws a graph with matplotlib.
 
-    Parameters
-    ----------
-    labels : List[str]
-        List of labels for each data point.
-    values : List[float]
-        List of values for each data point.
-    xlabel : str
-        Label for the x-axis.
-    ylabel : str
-        Label for the y-axis.
-    title : str
-        Title of the graph.
-    filename : str
-        Name of the file to save the graph as.
-    color_mapping : Dict[str, str], optional
-        Mapping of labels to colors. If not provided, all data points will be gray.
-    rotation : bool, optional
-        Whether to rotate the x-axis labels. Defaults to True.
-    style : str, optional
-        Style of the graph. Can be 'bar', 'line', or 'scatter'. Defaults to 'bar'.
+    Parameters:
+    labels (list): labels for the x-axis
+    values (list): values to be plotted
+    xlabel (str): label for the x-axis
+    ylabel (str): label for the y-axis
+    title (str): title of the graph
+    filename (str): name of the file to be saved
+    color_mapping (dict, optional): dictionary mapping labels to colors
+    rotation (bool, optional): whether to rotate the x-axis labels by 90 degrees
+    style (str, optional): style of the graph ('bar', 'line', 'scatter')
 
-    Raises
-    ------
-    ValueError
-        If an unknown style is provided.
-
-    Returns
-    -------
+    Returns:
     None
     """
-    dir_name = 'graphs'
-    os.makedirs(dir_name, exist_ok=True)
+    graphs_dir = 'graphs'
+    os.makedirs(graphs_dir, exist_ok=True)
 
-    fig, axis = plt.subplots()
-
+    fig, ax = plt.subplots()
 
     match style:
         case 'bar':
             if color_mapping:
                 colors = [color_mapping.get(label, 'gray') for label in labels]
-                axis.bar(labels, values, color=colors)
+                ax.bar(labels, values, color=colors)
             else:
-                axis.bar(labels, values)
+                ax.bar(labels, values)
         case 'line':
             if color_mapping:
                 colors = [color_mapping.get(label, 'gray') for label in labels]
-                axis.plot(labels, values, color=colors)
+                ax.plot(labels, values, color=colors)
             else:
-                axis.plot(labels, values)
+                ax.plot(labels, values)
         case 'scatter':
             if color_mapping:
                 colors = [color_mapping.get(label, 'gray') for label in labels]
-                axis.scatter(labels, values, color=colors)
+                ax.scatter(labels, values, color=colors)
             else:
-                axis.scatter(labels, values)
+                ax.scatter(labels, values)
         case _:
             raise ValueError(f'Unknown style: {style}')
 
-    axis.set_title(title)
-    axis.set_xlabel(xlabel)
-    axis.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
     if min(map(float, values)) >= 0:
-        axis.set_ylim(bottom=0)
+        ax.set_ylim(bottom=0)
 
     if rotation:
-        axis.tick_params(axis='x', rotation=90)
-    axis.grid(axis='x', linestyle='-', alpha=0.3)
+        ax.tick_params(axis='x', rotation=90)
+    ax.grid(axis='x', linestyle='-', alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig(os.path.join(dir_name, filename))
+    plt.savefig(os.path.join(graphs_dir, filename))
     plt.close()
 
 
-def draw_table(values, rows, columns, title, filename):
+def draw_table(
+        data, 
+        row_labels, 
+        column_labels, 
+        title, 
+        filename):
     """
+    Draws a table with matplotlib.
+
+    Parameters:
+    data (list of lists): 2D data to be displayed
+    row_labels (list): labels for the rows
+    column_labels (list): labels for the columns
+    title (str): title of the table
+    filename (str): name of the file to be saved
+
+    Returns:
+    None
     """
-    dir_name = 'graphs'
-    os.makedirs(dir_name, exist_ok=True)
+    graphs_dir = 'graphs'
+    os.makedirs(graphs_dir, exist_ok=True)
     fig, axis = plt.subplots()
     axis.axis('off')
 
     table = axis.table(
-        cellText=values,
-        rowLabels=rows,
-        colLabels=columns,
+        cellText=data,
+        rowLabels=row_labels,
+        colLabels=column_labels,
         loc='center'
     )
 
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.scale(1, 1.5)
-    plt.title(title)
+    axis.set_title(title)
 
-    path = os.path.join(dir_name, filename)
+    path = os.path.join(graphs_dir, filename)
     plt.savefig(path, bbox_inches='tight')
     plt.close()
 
