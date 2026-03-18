@@ -2,7 +2,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/kubakalisciak/bus-delays?color=%23f78166)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kubakalisciak/bus-delays/fetch.yml?label=fetch&color=%23238636)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kubakalisciak/bus-delays/merge.yml?label=merge&color=%233572a5)  
-This repo **will not be updated**.
 - ---
 A quirky project gathering data on delays of buses in my hometown (Białystok) and working with this data. Also an exercise in matplotlib and Github Actions.
 
