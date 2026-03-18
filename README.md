@@ -32,9 +32,9 @@ git pull
 
 2. **Generate graphs**
 
-   - Run `graphs.py` to generate graphs from the CSV. The images are saved in the `graphs` directory.
+- Run `graphs.py` to generate graphs from the CSV. The images are saved in the `graphs` directory.
 
-   - Choose the the graph type (the 1st flag):
+- Choose the the graph type (the 1st flag):
 
 |Flag|Graph Description|Filename|
 |---|---|---|
@@ -62,7 +62,7 @@ python graphs.py --avg-delay-day --2026-02
 
 3. **Access the graphs**
 
-    - The generated images are saved in `graphs`. Open them with your OS image viewer:
+- The generated images are saved in `graphs`. Open them with your OS image viewer:
 
 ```bash
 xdg-open graphs/avg_delay__line.png
