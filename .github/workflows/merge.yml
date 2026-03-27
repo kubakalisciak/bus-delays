@@ -43,7 +43,7 @@ jobs:
         run: |
           if git status --porcelain | grep .; then
             git add output
-            git commit -m "ACTIONS: update data on main"
+            git commit -m "chore: sync data updates to main"
             git push origin main
           else
             echo "No changes to sync"
