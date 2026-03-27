@@ -70,7 +70,6 @@ xdg-open graphs/avg_delay__line.png
 
 ## To-Do's
 
-- [ ] Add a "Run Report" table
 
 ## License
 

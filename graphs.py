@@ -1,5 +1,5 @@
 from draw import draw_graph, draw_table
-import os, csv, sys, statistics
+import os, csv, sys, statistics, datetime
 
 
 def read_dataset(set_name):
@@ -258,7 +258,20 @@ def graph_median_delay_by_time_of_day(data):
                style='line')
 
 
+def create_log(success, graph_name, dataset_name, filename='_log.txt', dir='graphs'):
+    with open(os.path.join(dir, filename), 'w') as file:
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"current time: {now}\n")
+        file.write(f"success: {success}\n")
+        if success:
+            file.write(f"flag name: {graph_name}\n")
+            file.write(f"dataset name: {dataset_name}\n")
+            file.write(f"dataset size: {len(read_dataset(dataset_name))} entries\n")
+
+
+
 def main():
+    success = False
     graph_name = sys.argv[1]
     dataset_name = sys.argv[2][2:]
     if dataset_name == 'all':
@@ -279,10 +292,12 @@ def main():
 
     if graph_name in graph_functions:
         graph_functions[graph_name](data)
+        success = True
     else:
         print(f"Invalid command: {graph_name}. Try again.")
         print("Refer to README.md for possible options.")
 
+    create_log(success, graph_name, dataset_name)
 
 
 if __name__ == "__main__":
