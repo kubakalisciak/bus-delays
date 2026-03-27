@@ -73,14 +73,12 @@ def draw_graph(
     plt.close()
 
 
-def draw_table(
-        data, 
-        row_labels, 
-        column_labels, 
-        title, 
-        filename):
+import os
+import matplotlib.pyplot as plt
+
+def draw_table(data, row_labels, column_labels, title, filename):
     """
-    Draws a table with matplotlib.
+    Draws a table with matplotlib and places the title just above the table.
 
     Parameters:
     data (list of lists): 2D data to be displayed
@@ -88,28 +86,38 @@ def draw_table(
     column_labels (list): labels for the columns
     title (str): title of the table
     filename (str): name of the file to be saved
-
-    Returns:
-    None
     """
     graphs_dir = 'graphs'
     os.makedirs(graphs_dir, exist_ok=True)
-    fig, axis = plt.subplots()
-    axis.axis('off')
 
-    table = axis.table(
+    fig, ax = plt.subplots()
+    ax.axis('off')
+
+    # Create the table
+    table = ax.table(
         cellText=data,
         rowLabels=row_labels,
         colLabels=column_labels,
         loc='center'
     )
-
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
     table.scale(1, 1.5)
-    axis.set_title(title)
+
+    # Draw canvas to compute table size
+    fig.canvas.draw()
+    bbox = table.get_window_extent(fig.canvas.get_renderer())
+    # Convert bbox from pixels to axes coordinates
+    inv = ax.transAxes.inverted()
+    bbox_ax = inv.transform([[bbox.x0, bbox.y0], [bbox.x1, bbox.y1]])
+
+    # Place title just above the table
+    x_center = 0.5  # horizontal center
+    y_top = bbox_ax[1, 1] + 0.02  # slightly above the table
+    ax.text(
+        x_center, y_top, title,
+        ha='center', va='bottom',
+        transform=ax.transAxes,
+    )
 
     path = os.path.join(graphs_dir, filename)
     plt.savefig(path, bbox_inches='tight')
     plt.close()
-

@@ -108,7 +108,7 @@ def table_delays_by_line(data):
     keys = list(processed_data.keys())
     values = list(processed_data.values())
 
-    draw_table(values, keys, ['avg', 'median'], "Delays by line", 'delays__line.png')
+    draw_table(values, keys, ['Average delay', 'Median delay'], "Delays by line", 'delays__line.png')
 
 
 def graph_average_delays_by_day(data):
