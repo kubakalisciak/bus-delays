@@ -13,6 +13,7 @@ def read_dataset(set_name):
                 output.append(row)
     except FileNotFoundError:
         print("This dataset does not exist.")
+        return False
     return output
 
 
@@ -258,26 +259,30 @@ def graph_median_delay_by_time_of_day(data):
                style='line')
 
 
-def create_log(success, graph_name, dataset_name, filename='_log.txt', dir='graphs'):
+def create_log(success, graph_name, dataset_name, dataset_size, start_time, filename='_report.txt', dir='graphs'):
     with open(os.path.join(dir, filename), 'w') as file:
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        file.write(f"current time: {now}\n")
+        now = datetime.datetime.now()
+        file.write(f"current time: {now.strftime('%Y-%m-%d %H:%M:%S')}\n")
         file.write(f"success: {success}\n")
         if success:
             file.write(f"flag name: {graph_name}\n")
             file.write(f"dataset name: {dataset_name}\n")
-            file.write(f"dataset size: {len(read_dataset(dataset_name))} entries\n")
+            file.write(f"dataset size: {dataset_size} entries\n")
+            file.write(f"time: {(now - start_time).total_seconds():.3f}s\n")
 
 
 
 def main():
     success = False
+    start_time = datetime.datetime.now()
     graph_name = sys.argv[1]
     dataset_name = sys.argv[2][2:]
     if dataset_name == 'all':
         data = read_all_datasets()
     else:
         data = read_dataset(dataset_name)
+
+    dataset_size = len(data) if data else 0
 
     graph_functions = {
         '--delays-line': table_delays_by_line,
@@ -297,7 +302,7 @@ def main():
         print(f"Invalid command: {graph_name}. Try again.")
         print("Refer to README.md for possible options.")
 
-    create_log(success, graph_name, dataset_name)
+    create_log(success, graph_name, dataset_name, dataset_size, start_time)
 
 
 if __name__ == "__main__":
