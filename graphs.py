@@ -272,7 +272,7 @@ def graph_average_line_delay_by_day(data, line):
                'date',
                'average delay',
                f'Average delay by date on line {line}',
-               f'avg_delay__hour_{line}.png',
+               f'avg_delay__day_{line}.png',
                style='line')
     except ValueError:
         return False

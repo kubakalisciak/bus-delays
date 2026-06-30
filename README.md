@@ -44,8 +44,8 @@ git pull
 |`--delays-line`|Average and median delay over the dataset by line (in table format)|`delays__line.png`|
 |`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
 |`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
-|`--avg-line-delay-day`|Average delay of a specific over the dataset by date|`avg_delay__day_{line_number}.png`|
-|`--avg-line-delay-hour`|Average delay of a specific over the dataset by hour of day|`avg_delay__hour_{line_number}.png`|
+|`--avg-line-delay-day`|Average delay of a specificline over the dataset by date|`avg_delay__day_{line_number}.png`|
+|`--avg-line-delay-hour`|Average delay of a specific line over the dataset by hour of day|`avg_delay__hour_{line_number}.png`|
 
 
 - Pick the dataset (*monthly*) (the 2nd flag)
