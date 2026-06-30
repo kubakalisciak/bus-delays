@@ -77,9 +77,16 @@ def create_log(success, graph_name, dataset_name, dataset_size, start_time, file
         now = datetime.datetime.now()
         file.write(f"current time: {now.strftime('%Y-%m-%d %H:%M:%S')}\n")
         file.write(f"success: {success}\n")
-        if success:
+        if graph_name == '--avg-line-delay-hour' or graph_name == '--avg-line-delay-day':
+            file.write(f"flag name: {graph_name}")
+            if success:
+                file.write(f" (line: {sys.argv[3][2:]})\n")
+            else:
+                file.write("\n")
+        else:
             file.write(f"flag name: {graph_name}\n")
-            file.write(f"dataset name: {dataset_name}\n")
+        file.write(f"dataset name: {dataset_name}\n")
+        if success:
             file.write(f"dataset size: {dataset_size} entries\n")
             file.write(f"time: {(now - start_time).total_seconds():.3f}s\n")
 
@@ -260,12 +267,17 @@ def graph_average_line_delay_by_day(data, line):
     avg_delays = {date: value / count[date] for date, value in summed_delays.items()}
     labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=False)
 
-    draw_graph(labels, values,
+    try:
+        draw_graph(labels, values,
                'date',
                'average delay',
                f'Average delay by date on line {line}',
                f'avg_delay__hour_{line}.png',
                style='line')
+    except ValueError:
+        return False
+    
+    return True
 
 
 def main():
@@ -293,10 +305,10 @@ def main():
 
     if graph_name in graph_functions:
         if graph_name == '--avg-line-delay-hour' or graph_name == '--avg-line-delay-day':
-            graph_functions[graph_name](data, sys.argv[3][2:])
+            success = graph_functions[graph_name](data, sys.argv[3][2:])
         else:
             graph_functions[graph_name](data)
-        success = True
+            success = True
     else:
         print(f"Invalid command: {graph_name}. Try again.")
         print("Refer to README.md for possible options.")
