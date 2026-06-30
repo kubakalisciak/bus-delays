@@ -25,6 +25,7 @@ jobs:
         run: |
           set -e
           git fetch origin
+
           if git show-ref --verify --quiet refs/remotes/origin/data; then
             echo "data branch exists"
           else
@@ -43,7 +44,7 @@ jobs:
       - name: Switch to data branch
         run: |
           git checkout data
-          git pull origin data
+          git pull --rebase origin data
 
       - name: Sync script and requirements onto data branch
         run: |
@@ -56,7 +57,8 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
 
       - name: Run fetch script
         run: |
@@ -67,12 +69,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/*.csv
+
+          git add output/*.csv api.py requirements.txt
+
           if git diff --cached --quiet; then
             echo "No new data"
           else
             git commit -m "chore: pull data from external API"
-            git fetch origin data
-            git pull --rebase origin data
             git push origin data
           fi
