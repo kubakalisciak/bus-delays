@@ -5,14 +5,16 @@ on:
     - cron: '*/5 * * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
-  group: concurrent
+  group: fetch-data
   cancel-in-progress: true
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -22,9 +24,7 @@ jobs:
       - name: Ensure data branch exists
         run: |
           set -e
-
           git fetch origin
-
           if git show-ref --verify --quiet refs/remotes/origin/data; then
             echo "data branch exists"
           else
@@ -34,11 +34,24 @@ jobs:
             git checkout main
           fi
 
+      - name: Save current script and requirements from main
+        run: |
+          mkdir -p /tmp/script-cache
+          cp api.py /tmp/script-cache/
+          cp requirements.txt /tmp/script-cache/
+
       - name: Switch to data branch
-        run: git checkout data
+        run: |
+          git checkout data
+          git pull origin data
+
+      - name: Sync script and requirements onto data branch
+        run: |
+          cp /tmp/script-cache/api.py ./api.py
+          cp /tmp/script-cache/requirements.txt ./requirements.txt
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -54,12 +67,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add output/*.csv
-
           if git diff --cached --quiet; then
             echo "No new data"
           else
             git commit -m "chore: pull data from external API"
+            git fetch origin data
+            git pull --rebase origin data
             git push origin data
           fi

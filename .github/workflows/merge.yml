@@ -2,48 +2,66 @@ name: merge
 
 on:
   schedule:
-    # every 3 days at 02:00 UTC
     - cron: '0 1 */3 * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
-  group: concurrent
+  group: merge-output
   cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      # 1️⃣ Checkout repo with full history
       - name: Checkout main
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
-      # 2️⃣ Git identity
       - name: Configure git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 3️⃣ Ensure main branch
       - name: Switch to main
         run: git checkout main
 
-      # 4️⃣ Replace output folder with data branch version
-      - name: Sync output from data
+      - name: Check data branch exists
+        id: check_data
         run: |
-          git fetch origin
+          git fetch origin data
+          if git show-ref --verify --quiet refs/remotes/origin/data; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "data branch does not exist yet — skipping sync"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sync output from data
+        if: steps.check_data.outputs.exists == 'true'
+        run: |
           rm -rf output
           git checkout origin/data -- output
 
-      # 5️⃣ Commit & push if changed
+      - name: Validate synced data
+        if: steps.check_data.outputs.exists == 'true'
+        run: |
+          if [ ! -d output ] || [ -z "$(ls -A output/*.csv 2>/dev/null)" ]; then
+            echo "No CSV files found in output/, aborting sync to avoid pushing empty/broken data"
+            exit 1
+          fi
+
       - name: Commit and push
+        if: steps.check_data.outputs.exists == 'true'
         run: |
           if git status --porcelain | grep .; then
             git add output
             git commit -m "chore: sync data updates to main"
+            git fetch origin main
+            git pull --rebase origin main
             git push origin main
           else
             echo "No changes to sync"
