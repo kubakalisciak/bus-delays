@@ -94,7 +94,6 @@ def compute_all_graphs(data):
 # ================================
 
 
-    return labels, values
 def table_delays_by_line(data):
     collected_data = {}
     for row in data:

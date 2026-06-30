@@ -40,24 +40,29 @@ git pull
 |---|---|---|
 |`--recompute`|Draw all the graphs|respective names of each graph|
 |`--avg-delay-date`|Average delay over the dataset by date|`avg_delay__date.png`|
-|`--avg-delay-time`|Average delay over the dataset by time of day|`avg_delay__time.png`|
+|`--avg-delay-hour`|Average delay over the dataset by hour of day|`avg_delay__hour.png`|
 |`--delays-line`|Average and median delay over the dataset by line (in table format)|`delays__line.png`|
-|`--median-delay-date`|Median delay over the dataset by date|`median_delay__date.png`|
-|`--median-delay-time`|Median delay over the dataset by time of day|`median_delay__time.png`|
 |`--punctuality-percent`|Shows the percentage of rides that were on time, delayed, or early|`punctuality_percent.png`|
 |`--punctuality`|Shows the punctuality status of the rides|`punctuality.png`|
+|`--avg-line-delay-day`|Average delay of a specific over the dataset by date|`avg_delay__day_{line_number}.png`|
+|`--avg-line-delay-hour`|Average delay of a specific over the dataset by hour of day|`avg_delay__hour_{line_number}.png`|
 
 
 - Pick the dataset (*monthly*) (the 2nd flag)
 
 - Format: `--YYYY-MM`, where `YYYY` is the full year number and `MM` the zero-padded month number or `--all` to access all datasets
 
+- When using `--avg-line-delay-day` or `--avg-line-delay-hour` a line number flag is also needed
+
+
 Examples:
 
 ```bash
 python graphs.py --avg-delay-line --all
 
-python graphs.py --avg-delay-day --2026-02
+python graphs.py --punctuality --2026-05
+
+python graphs.py --avg-line-delay-day --2026-02 --14
 ```
 
 3. **Access the graphs**
@@ -67,8 +72,6 @@ python graphs.py --avg-delay-day --2026-02
 ```bash
 xdg-open graphs/avg_delay__line.png
 ```
-
-## To-Do's
 
 
 ## License
