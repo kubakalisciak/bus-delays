@@ -72,19 +72,29 @@ def read_all_datasets():
     return data
 
 
+def create_log(success, graph_name, dataset_name, dataset_size, start_time, filename='_report.txt', dir='graphs'):
+    with open(os.path.join(dir, filename), 'w') as file:
+        now = datetime.datetime.now()
+        file.write(f"current time: {now.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        file.write(f"success: {success}\n")
+        if success:
+            file.write(f"flag name: {graph_name}\n")
+            file.write(f"dataset name: {dataset_name}\n")
+            file.write(f"dataset size: {dataset_size} entries\n")
+            file.write(f"time: {(now - start_time).total_seconds():.3f}s\n")
+
+
 def compute_all_graphs(data):
     table_delays_by_line(data)
     graph_average_delays_by_day(data)
-    graph_median_delay_by_date(data)
     graph_punctuality(data)
     graph_punctuality_percentage(data)
-    graph_average_delay_by_time_of_day(data)
-    graph_median_delay_by_time_of_day(data)
-
+    graph_average_delay_by_hour(data)
 
 # ================================
 
 
+    return labels, values
 def table_delays_by_line(data):
     collected_data = {}
     for row in data:
@@ -132,28 +142,6 @@ def graph_average_delays_by_day(data):
                'average delay',
                'Average delay by date',
                'avg_delay__date.png',
-               style='line')
-
-
-def graph_median_delay_by_date(data):
-    organized_data = {}
-    for row in data:
-        date = row['date']
-        try:
-            organized_data[date].append(int(row['calculated_delay']))
-        except KeyError:
-            organized_data[date] = [int(row['calculated_delay'])]
-
-    for key in organized_data.keys():
-        organized_data[key] = int(statistics.median(organized_data[key]))
-
-    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=False)
-
-    draw_graph(labels, values,
-               'date',
-               'median delay',
-               'Median delay by date',
-               'median_delay__date.png',
                style='line')
     
 
@@ -208,7 +196,7 @@ def graph_punctuality_percentage(data):
                rotation=False)
     
 
-def graph_average_delay_by_time_of_day(data):
+def graph_average_delay_by_hour(data):
     organized_data = {}
     if not data:
         return
@@ -231,45 +219,54 @@ def graph_average_delay_by_time_of_day(data):
                'hour of day',
                'average delay',
                'Average delay by hour of day',
-               'avg_delay__time.png',
+               'avg_delay__hour.png',
                style='line')
 
 
-def graph_median_delay_by_time_of_day(data):
-    organized_data = {}
+def graph_average_line_delay_by_hour(data, line):
+    count, summed_delays = {}, {}
     for row in data:
-        hour = row['time']
-        if hour:
-                hour = int(hour.split(':')[0])
-                try:
-                    organized_data[str(hour)].append(int(row['calculated_delay']))
-                except KeyError:
-                    organized_data[str(hour)] = [int(row['calculated_delay'])]
-
-    for row in organized_data:
-        organized_data[row] = float(statistics.median(organized_data[row]))
-
-    labels, values = sort_by_labels(organized_data, value_as_num=True, key_as_num=True)
+        if row['line'] == line:
+            hour = row['time'].split(':')[0]
+            try:
+                count[hour] += 1
+                summed_delays[hour] += int(row['calculated_delay'])
+            except KeyError:
+                count[hour] = 1
+                summed_delays[hour] = int(row['calculated_delay'])
+    
+    avg_delays = {hour: value / count[hour] for hour, value in summed_delays.items()}
+    labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=True)
 
     draw_graph(labels, values,
                'hour of day',
-               'median delay',
-               'Median delay by hour of day',
-               'median_delay__time.png',
+               'average delay',
+               f'Average delay by hour of day on line {line}',
+               f'avg_delay__hour_{line}.png',
                style='line')
+    
 
+def graph_average_line_delay_by_day(data, line):
+    count, summed_delays = {}, {}
+    for row in data:
+        if row['line'] == line:
+            date = row['date']
+            try:
+                count[date] += 1
+                summed_delays[date] += int(row['calculated_delay'])
+            except KeyError:
+                count[date] = 1
+                summed_delays[date] = int(row['calculated_delay'])
+    
+    avg_delays = {date: value / count[date] for date, value in summed_delays.items()}
+    labels, values = sort_by_labels(avg_delays, value_as_num=True, key_as_num=False)
 
-def create_log(success, graph_name, dataset_name, dataset_size, start_time, filename='_report.txt', dir='graphs'):
-    with open(os.path.join(dir, filename), 'w') as file:
-        now = datetime.datetime.now()
-        file.write(f"current time: {now.strftime('%Y-%m-%d %H:%M:%S')}\n")
-        file.write(f"success: {success}\n")
-        if success:
-            file.write(f"flag name: {graph_name}\n")
-            file.write(f"dataset name: {dataset_name}\n")
-            file.write(f"dataset size: {dataset_size} entries\n")
-            file.write(f"time: {(now - start_time).total_seconds():.3f}s\n")
-
+    draw_graph(labels, values,
+               'date',
+               'average delay',
+               f'Average delay by date on line {line}',
+               f'avg_delay__hour_{line}.png',
+               style='line')
 
 
 def main():
@@ -287,16 +284,19 @@ def main():
     graph_functions = {
         '--delays-line': table_delays_by_line,
         '--avg-delay-date': graph_average_delays_by_day,
-        '--median-delay-date': graph_median_delay_by_date,
         '--punctuality': graph_punctuality,
         '--punctuality-percent': graph_punctuality_percentage,
-        '--avg-delay-time': graph_average_delay_by_time_of_day,
-        '--median-delay-time': graph_median_delay_by_time_of_day,
+        '--avg-delay-hour': graph_average_delay_by_hour,
+        '--avg-line-delay-hour': graph_average_line_delay_by_hour,
+        '--avg-line-delay-day': graph_average_line_delay_by_day,
         '--recompute': compute_all_graphs
     }
 
     if graph_name in graph_functions:
-        graph_functions[graph_name](data)
+        if graph_name == '--avg-line-delay-hour' or graph_name == '--avg-line-delay-day':
+            graph_functions[graph_name](data, sys.argv[3][2:])
+        else:
+            graph_functions[graph_name](data)
         success = True
     else:
         print(f"Invalid command: {graph_name}. Try again.")
